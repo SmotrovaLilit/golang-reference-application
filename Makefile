@@ -5,3 +5,9 @@ $(GOLANGCI_LINT_BIN):
 
 lint: $(GOLANGCI_LINT_BIN)
 	$(GOLANGCI_LINT_BIN) run ./...
+
+generate:
+	go generate ./cmd/server/wire.go
+
+build: generate
+	go build ./cmd/server
