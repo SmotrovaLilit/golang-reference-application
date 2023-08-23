@@ -7,8 +7,9 @@
 package main
 
 import (
-	"gorm.io/driver/sqlite"
+	"fmt"
 	"gorm.io/gorm"
+	"net"
 	http2 "net/http"
 	"reference-application/internal/application"
 	"reference-application/internal/application/commands/createprogram"
@@ -18,8 +19,7 @@ import (
 
 // Injectors from wire.go:
 
-func NewApplication() Application {
-	db := provideDB()
+func NewApplication(db *gorm.DB, addr HTTPAddr) Application {
 	programRepository := repositories.NewProgramRepository(db)
 	handler := createprogram.Handler{
 		Repository: programRepository,
@@ -31,28 +31,29 @@ func NewApplication() Application {
 	httpHandler := http.NewHandler(endpoints)
 	mainApplication := Application{
 		HTTPHandler: httpHandler,
+		HTTPAddr:    addr,
 	}
 	return mainApplication
 }
 
 // wire.go:
 
+type HTTPAddr string
+
 type Application struct {
 	HTTPHandler http2.Handler
+	HTTPAddr    HTTPAddr
 }
 
-func (app Application) Run() error {
-	return http2.ListenAndServe(":8080", app.HTTPHandler)
+func (app *Application) Run() error {
+	ln, err := net.Listen("tcp", string(app.HTTPAddr))
+	if err != nil {
+		return err
+	}
+	fmt.Println("HTTP server listening on", string(app.HTTPAddr))
+	return app.Serve(ln)
 }
 
-func provideDB() *gorm.DB {
-	db, err := gorm.Open(sqlite.Open("test.db"), &gorm.Config{})
-	if err != nil {
-		panic("failed to connect database")
-	}
-	err = db.AutoMigrate(repositories.ProgramModel{})
-	if err != nil {
-		panic("failed to migrate database")
-	}
-	return db
+func (app *Application) Serve(l net.Listener) error {
+	return http2.Serve(l, app.HTTPHandler)
 }
