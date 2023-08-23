@@ -22,5 +22,15 @@ func NewID(raw string) (ID, error) {
 	return ID{id: id}, nil
 }
 
+// MustNewID is a constructor for ID.
+// It panics if the given raw string is invalid.
+func MustNewID(raw string) ID {
+	id, err := NewID(raw)
+	if err != nil {
+		panic(err)
+	}
+	return id
+}
+
 // String returns a string representation of ID.
 func (i ID) String() string { return i.id.String() }

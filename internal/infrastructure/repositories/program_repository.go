@@ -40,3 +40,18 @@ func (r *ProgramRepository) Save(ctx context.Context, program program.Program) {
 		panic(err)
 	}
 }
+
+// FindByID finds a program by id.
+// This method is a part of ProgramRepository interface.
+// It panics if an errors occurs.
+func (r *ProgramRepository) FindByID(ctx context.Context, id program.ID) program.Program {
+	var model ProgramModel
+	err := r.db.WithContext(ctx).First(&model, "id = ?", id.String()).Error
+	if err != nil {
+		panic(err)
+	}
+	return program.NewProgram(
+		program.MustNewID(model.ID),
+		program.MustNewPlatformCode(model.PlatformCode),
+	)
+}

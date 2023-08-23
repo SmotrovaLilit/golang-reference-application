@@ -27,5 +27,15 @@ func NewPlatformCode(raw string) (PlatformCode, error) {
 	}
 }
 
+// MustNewPlatformCode is a constructor for PlatformCode.
+// It panics if the given raw string is invalid.
+func MustNewPlatformCode(raw string) PlatformCode {
+	code, err := NewPlatformCode(raw)
+	if err != nil {
+		panic(err)
+	}
+	return code
+}
+
 // String returns a string representation of PlatformCode.
 func (code PlatformCode) String() string { return string(code) }
