@@ -2,6 +2,7 @@ package tests
 
 import (
 	"context"
+	"github.com/DATA-DOG/go-sqlmock"
 	"github.com/stretchr/testify/require"
 	"github.com/testcontainers/testcontainers-go"
 	. "github.com/testcontainers/testcontainers-go/modules/postgres"
@@ -24,6 +25,8 @@ type IntegrationTest struct {
 	Addr string
 }
 
+// PrepareIntegrationTest starts the server and returns the address of the server and a database connection.
+// The server is killed when the test is finished.
 func PrepareIntegrationTest(t *testing.T) IntegrationTest {
 	t.Helper()
 	dbTest := PrepareTestWithDatabase(t)
@@ -60,6 +63,10 @@ type TestWithDatabase struct {
 	DSN string
 }
 
+// PrepareTestWithDatabase starts a postgres container and returns a database connection.
+// The container is killed when the test is finished.
+// The database is cleaned up when the test is finished.
+// Migration is run on the database.
 func PrepareTestWithDatabase(t *testing.T) TestWithDatabase {
 	t.Helper()
 
@@ -82,6 +89,23 @@ func PrepareTestWithDatabase(t *testing.T) TestWithDatabase {
 	return TestWithDatabase{
 		DB:  db,
 		DSN: dsn,
+	}
+}
+
+type TestWithMockedDatabase struct {
+	sqlmock.Sqlmock
+	DB *gorm.DB
+}
+
+func PrepareTestWithMockedDatabase(t *testing.T) TestWithMockedDatabase {
+	stdDB, mock, err := sqlmock.New()
+	require.NoError(t, err)
+	db, err := gorm.Open(postgres.New(postgres.Config{Conn: stdDB}), &gorm.Config{})
+	require.NoError(t, err)
+
+	return TestWithMockedDatabase{
+		DB:      db,
+		Sqlmock: mock,
 	}
 }
 

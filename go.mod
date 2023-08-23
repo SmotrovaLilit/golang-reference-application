@@ -3,6 +3,7 @@ module reference-application
 go 1.21
 
 require (
+	github.com/DATA-DOG/go-sqlmock v1.5.0
 	github.com/go-kit/kit v0.12.0
 	github.com/google/uuid v1.3.0
 	github.com/google/wire v0.5.0
