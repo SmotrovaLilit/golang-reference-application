@@ -8,10 +8,12 @@ import (
 	"net/http"
 	"reference-application/internal/application/commands/createprogram"
 	"reference-application/internal/domain/program"
+	"reference-application/internal/domain/version"
 	xhttp "reference-application/internal/pkg/http"
 )
 
 // newCreateProgramHandler creates a new http.Handler to create a program.
+// TODO no one test with this function
 func newCreateProgramHandler(e createprogram.Endpoint) http.Handler {
 	return kithttp.NewServer(
 		endpoint.Endpoint(e),
@@ -25,6 +27,10 @@ func newCreateProgramHandler(e createprogram.Endpoint) http.Handler {
 type createProgramRequestDTO struct {
 	ID           string `json:"id"`
 	PlatformCode string `json:"platform_code"`
+	Version      struct {
+		ID   string `json:"id"`
+		Name string `json:"name"`
+	} `json:"version"`
 }
 
 // decodeCreateProgramRequest decodes a request to create a program.
@@ -42,5 +48,19 @@ func decodeCreateProgramRequest(_ context.Context, request *http.Request) (inter
 	if err != nil {
 		return nil, xhttp.NewUnprocessableEntityError(err)
 	}
-	return createprogram.NewCommand(_id, platformCode), nil
+	versionID, err := version.NewID(dto.Version.ID)
+	if err != nil {
+		return nil, xhttp.NewUnprocessableEntityError(err)
+	}
+	versionName, err := version.NewName(dto.Version.Name)
+	if err != nil {
+		return nil, xhttp.NewUnprocessableEntityError(err)
+	}
+
+	return createprogram.NewCommand(
+		_id,
+		platformCode,
+		versionID,
+		versionName,
+	), nil
 }

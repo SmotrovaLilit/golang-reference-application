@@ -11,7 +11,7 @@ var _ repositories.ProgramRepository = (*ProgramRepository)(nil)
 
 // ProgramModel is a model for a program.
 type ProgramModel struct {
-	ID           string `gorm:"primaryKey"`
+	ID           string `gorm:"primaryKey"` // TODO change to uuid, fix in https://github.com/SmotrovaLilit/golang-reference-application/issues/11
 	PlatformCode string
 }
 
@@ -25,7 +25,7 @@ type ProgramRepository struct {
 
 // NewProgramRepository creates a new ProgramRepository.
 func NewProgramRepository(db *gorm.DB) *ProgramRepository {
-	return &ProgramRepository{db}
+	return &ProgramRepository{db: db}
 }
 
 // Save saves a program.

@@ -1,4 +1,4 @@
-package program
+package version
 
 import (
 	"reference-application/internal/pkg/id"
