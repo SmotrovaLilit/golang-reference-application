@@ -21,8 +21,10 @@ import (
 
 func NewApplication(db *gorm.DB, addr HTTPAddr) Application {
 	programRepository := repositories.NewProgramRepository(db)
+	versionRepository := repositories.NewVersionRepository(db)
 	handler := createprogram.Handler{
-		Repository: programRepository,
+		Repository:        programRepository,
+		VersionRepository: versionRepository,
 	}
 	endpoint := createprogram.NewEndpoint(handler)
 	endpoints := application.Endpoints{

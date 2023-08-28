@@ -7,5 +7,7 @@ import (
 
 var Set = wire.NewSet(
 	NewProgramRepository,
+	NewVersionRepository,
 	wire.Bind(new(repositories.ProgramRepository), new(*ProgramRepository)),
+	wire.Bind(new(repositories.VersionRepository), new(*VersionRepository)),
 )

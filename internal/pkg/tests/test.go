@@ -83,7 +83,7 @@ func PrepareTestWithDatabase(t *testing.T) TestWithDatabase {
 		require.NoError(t, err)
 		require.NoError(t, sqlDB.Close())
 	})
-	err = db.AutoMigrate(repositories.ProgramModel{})
+	err = db.AutoMigrate(repositories.ProgramModel{}, repositories.VersionModel{}) // TODO https://github.com/SmotrovaLilit/golang-reference-application/issues/12
 	require.NoError(t, err)
 
 	return TestWithDatabase{

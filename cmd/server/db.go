@@ -20,7 +20,7 @@ func ConnectDB(dbType, dsn string) *gorm.DB {
 	if err != nil {
 		panic("failed to connect database")
 	}
-	err = db.AutoMigrate(repositories.ProgramModel{})
+	err = db.AutoMigrate(repositories.ProgramModel{}, repositories.VersionModel{})
 	if err != nil {
 		panic("failed to migrate database")
 	}
