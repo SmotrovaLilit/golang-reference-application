@@ -34,7 +34,7 @@ func decodeCreateProgramRequest(_ context.Context, request *http.Request) (inter
 	if err != nil {
 		return nil, xhttp.NewBadRequestError(err)
 	}
-	id, err := program.NewID(dto.ID)
+	_id, err := program.NewID(dto.ID)
 	if err != nil {
 		return nil, xhttp.NewUnprocessableEntityError(err)
 	}
@@ -42,5 +42,5 @@ func decodeCreateProgramRequest(_ context.Context, request *http.Request) (inter
 	if err != nil {
 		return nil, xhttp.NewUnprocessableEntityError(err)
 	}
-	return createprogram.NewCommand(id, platformCode), nil
+	return createprogram.NewCommand(_id, platformCode), nil
 }
