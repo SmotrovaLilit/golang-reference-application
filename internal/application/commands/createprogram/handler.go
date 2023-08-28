@@ -42,6 +42,7 @@ func (h Handler) Handle(ctx context.Context, cmd Command) {
 type Endpoint endpoint.Endpoint
 
 // NewEndpoint creates a new endpoint to create a program.
+// TODO no one test with this function, fix in https://github.com/SmotrovaLilit/golang-reference-application/issues/10
 func NewEndpoint(handler Handler) Endpoint {
 	return func(ctx context.Context, request interface{}) (response interface{}, err error) {
 		command := request.(Command)

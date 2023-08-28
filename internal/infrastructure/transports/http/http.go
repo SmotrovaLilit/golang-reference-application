@@ -9,6 +9,7 @@ import (
 )
 
 // NewHandler creates a new http.Handler.
+// TODO no one test with this function, fix in https://github.com/SmotrovaLilit/golang-reference-application/issues/10
 func NewHandler(endpoints application.Endpoints) http.Handler {
 	r := mux.NewRouter()
 	r.Handle("/programs", newCreateProgramHandler(endpoints.CreateProgramEndpoint)).Methods(http.MethodPost)
