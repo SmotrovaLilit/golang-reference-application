@@ -8,6 +8,7 @@ import (
 	"net/http/httptest"
 	"reference-application/internal/domain/program"
 	xhttp "reference-application/internal/pkg/http"
+	"reference-application/internal/pkg/id"
 	"strings"
 	"testing"
 )
@@ -42,7 +43,7 @@ func TestDecodeCreateProgramRequest(t *testing.T) {
 				"/programs",
 				strings.NewReader(`{"id":"invalid","platform_code":"ANDROID"}`),
 			),
-			wantErr: xhttp.NewUnprocessableEntityError(program.ErrInvalidID),
+			wantErr: xhttp.NewUnprocessableEntityError(id.ErrInvalidID),
 		},
 		{
 			name: "invalid platform code",
