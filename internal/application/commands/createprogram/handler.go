@@ -39,18 +39,18 @@ func NewCommand(
 
 // Handler is a handler to create a program.
 type Handler struct {
-	Repository        repositories.ProgramRepository
-	VersionRepository repositories.VersionRepository
+	UnitOfWork repositories.UnitOfWork
 }
 
 // Handle handles a command to create a program.
 func (h Handler) Handle(ctx context.Context, cmd Command) {
 	_program := program.NewProgram(cmd.ID, cmd.PlatformCode)
 	_version := version.NewVersion(cmd.VersionID, cmd.VersionName, _program.ID())
-	// TODO start transaction
-	h.Repository.Save(ctx, _program)
-	h.VersionRepository.Save(ctx, _version)
-	// End transaction
+
+	h.UnitOfWork.Do(ctx, func(store repositories.UnitOfWorkStore) {
+		store.ProgramRepository().Save(ctx, _program)
+		store.VersionRepository().Save(ctx, _version)
+	})
 }
 
 // Endpoint is an endpoint to create a program.

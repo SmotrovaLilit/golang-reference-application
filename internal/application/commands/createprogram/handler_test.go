@@ -15,9 +15,9 @@ func TestHandler_Handle(t *testing.T) {
 	dbTest := tests.PrepareTestWithDatabase(t)
 	programRepository := repositories.NewProgramRepository(dbTest.DB)
 	versionRepository := repositories.NewVersionRepository(dbTest.DB)
+
 	handler := createprogram.Handler{
-		Repository:        programRepository,
-		VersionRepository: versionRepository,
+		UnitOfWork: repositories.NewUnitOfWork(dbTest.DB),
 	}
 
 	cmd := createprogram.NewCommand(

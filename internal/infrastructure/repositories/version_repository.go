@@ -29,7 +29,7 @@ type VersionRepository struct {
 
 // NewVersionRepository creates a new VersionRepository.
 func NewVersionRepository(db *gorm.DB) *VersionRepository {
-	return &VersionRepository{db}
+	return &VersionRepository{db: db}
 }
 
 // Save saves a version.

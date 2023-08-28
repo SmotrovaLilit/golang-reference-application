@@ -25,7 +25,7 @@ type ProgramRepository struct {
 
 // NewProgramRepository creates a new ProgramRepository.
 func NewProgramRepository(db *gorm.DB) *ProgramRepository {
-	return &ProgramRepository{db}
+	return &ProgramRepository{db: db}
 }
 
 // Save saves a program.

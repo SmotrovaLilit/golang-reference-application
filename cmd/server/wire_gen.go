@@ -20,11 +20,9 @@ import (
 // Injectors from wire.go:
 
 func NewApplication(db *gorm.DB, addr HTTPAddr) Application {
-	programRepository := repositories.NewProgramRepository(db)
-	versionRepository := repositories.NewVersionRepository(db)
+	unitOfWork := repositories.NewUnitOfWork(db)
 	handler := createprogram.Handler{
-		Repository:        programRepository,
-		VersionRepository: versionRepository,
+		UnitOfWork: unitOfWork,
 	}
 	endpoint := createprogram.NewEndpoint(handler)
 	endpoints := application.Endpoints{
