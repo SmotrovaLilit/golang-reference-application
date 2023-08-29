@@ -1,0 +1,19 @@
+POST http://localhost:8080/programs
+Content-Type: application/json
+
+{
+    "id": "ecaffa6e-4302-4a46-ae72-44a7bd20dfd5",
+    "platform_code": "ANDROID",
+    "version": {
+      "id": "11a111cf-91f3-49dc-bb6d-ac4235635411",
+      "name": "version name"
+    }
+}
+
+###
+PUT http://localhost:8080/versions/11a111cf-91f3-49dc-bb6d-ac4235635411
+Content-Type: application/json
+
+{
+    "name": "new name"
+}

@@ -13,6 +13,7 @@ import (
 func NewHandler(endpoints application.Endpoints) http.Handler {
 	r := mux.NewRouter()
 	r.Handle("/programs", newCreateProgramHandler(endpoints.CreateProgramEndpoint)).Methods(http.MethodPost)
+	r.Handle("/versions/{id}", newUpdateProgramVersionHandler(endpoints.UpdateProgramVersionEndpoint)).Methods(http.MethodPut)
 	return r
 }
 

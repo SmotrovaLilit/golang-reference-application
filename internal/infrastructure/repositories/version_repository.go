@@ -2,6 +2,7 @@ package repositories
 
 import (
 	"context"
+	"errors"
 	"gorm.io/gorm"
 	"reference-application/internal/application/interfaces/repositories"
 	"reference-application/internal/domain/program"
@@ -49,17 +50,22 @@ func (r *VersionRepository) Save(ctx context.Context, version version.Version) {
 
 // FindByID finds a version by id.
 // This method is a part of VersionRepository interface.
+// It returns nil if a version is not found.
 // It panics if an errors occurs.
-func (r *VersionRepository) FindByID(ctx context.Context, id version.ID) version.Version {
+func (r *VersionRepository) FindByID(ctx context.Context, id version.ID) *version.Version {
 	var model VersionModel
 	err := r.db.WithContext(ctx).First(&model, "id = ?", id.String()).Error
 	if err != nil {
+		if errors.Is(err, gorm.ErrRecordNotFound) {
+			return nil
+		}
 		panic(err)
 	}
-	return version.NewExistingVersion(
+	_v := version.NewExistingVersion(
 		version.MustNewID(model.ID),
 		version.MustNewName(model.Name),
 		program.MustNewID(model.ProgramID),
 		version.MustNewStatus(model.Status),
 	)
+	return &_v
 }

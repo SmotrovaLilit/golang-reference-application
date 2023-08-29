@@ -92,6 +92,7 @@ func TestDecodeCreateProgramRequest(t *testing.T) {
 				return
 			}
 			require.Equal(t, tt.wantErr, err)
+			// TODO check that the command is created correctly https://github.com/SmotrovaLilit/golang-reference-application/issues/16
 		})
 	}
 }
