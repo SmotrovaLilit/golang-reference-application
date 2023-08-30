@@ -26,7 +26,9 @@ func TestCreateProgramHandler(t *testing.T) {
 
 	resp, err := http.DefaultClient.Do(req)
 	require.NoError(t, err)
-	defer resp.Body.Close()
+	t.Cleanup(func() {
+		resp.Body.Close()
+	})
 
 	programRepository := repositories.NewProgramRepository(test.DB)
 	versionRepository := repositories.NewVersionRepository(test.DB)
