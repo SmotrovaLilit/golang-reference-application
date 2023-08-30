@@ -38,23 +38,24 @@ func decodeCreateProgramRequest(_ context.Context, request *http.Request) (inter
 	dto := createProgramRequestDTO{}
 	err := json.NewDecoder(request.Body).Decode(&dto)
 	if err != nil {
-		return nil, xhttp.NewBadRequestError(err)
+		// TODO log original error  https://github.com/SmotrovaLilit/golang-reference-application/issues/2
+		return nil, ErrInvalidJson
 	}
 	_id, err := program.NewID(dto.ID)
 	if err != nil {
-		return nil, xhttp.NewUnprocessableEntityError(err)
+		return nil, err
 	}
 	platformCode, err := program.NewPlatformCode(dto.PlatformCode)
 	if err != nil {
-		return nil, xhttp.NewUnprocessableEntityError(err)
+		return nil, err
 	}
 	versionID, err := version.NewID(dto.Version.ID)
 	if err != nil {
-		return nil, xhttp.NewUnprocessableEntityError(err)
+		return nil, err
 	}
 	versionName, err := version.NewName(dto.Version.Name)
 	if err != nil {
-		return nil, xhttp.NewUnprocessableEntityError(err)
+		return nil, err
 	}
 
 	return createprogram.NewCommand(

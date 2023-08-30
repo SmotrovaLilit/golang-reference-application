@@ -3,14 +3,15 @@ package version
 import "reference-application/internal/pkg/errors"
 
 var (
-	ErrUpdateStatus = errors.New("invalid status to update version", "INVALID_STATUS_TO_UPDATE")
+	ErrUpdateVersionStatus = errors.New("invalid status to update version", "INVALID_STATUS_TO_UPDATE")
 )
 
 // Status is a type for a version status.
 type Status string
 
 const (
-	DraftStatus Status = "DRAFT"
+	DraftStatus    Status = "DRAFT"
+	OnReviewStatus Status = "ON_REVIEW"
 )
 
 // String returns a string representation of a status.
@@ -23,6 +24,8 @@ func MustNewStatus(s string) Status {
 	switch s {
 	case DraftStatus.String():
 		return DraftStatus
+	case OnReviewStatus.String():
+		return OnReviewStatus
 	}
 	panic("unknown status")
 }
@@ -37,5 +40,5 @@ func (s Status) canUpdate() error {
 	if s.isDraft() {
 		return nil
 	}
-	return ErrUpdateStatus
+	return ErrUpdateVersionStatus
 }

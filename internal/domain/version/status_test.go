@@ -44,7 +44,7 @@ func TestStatus_canUpdate(t *testing.T) {
 		{
 			name:    "failed",
 			s:       "NOT_DRAFT",
-			wantErr: ErrUpdateStatus,
+			wantErr: ErrUpdateVersionStatus,
 		},
 	}
 	for _, tt := range tests {

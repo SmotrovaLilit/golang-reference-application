@@ -46,7 +46,7 @@ func TestVersion_UpdateName(t *testing.T) {
 			args: args{
 				value: MustNewName("new-name"),
 			},
-			wantErr: ErrUpdateStatus,
+			wantErr: ErrUpdateVersionStatus,
 		},
 	}
 	for _, tt := range tests {

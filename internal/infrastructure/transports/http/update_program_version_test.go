@@ -2,13 +2,11 @@ package http
 
 import (
 	"context"
-	"errors"
 	"github.com/gorilla/mux"
 	"github.com/stretchr/testify/require"
 	"net/http"
 	"net/http/httptest"
 	"reference-application/internal/domain/version"
-	xhttp "reference-application/internal/pkg/http"
 	"reference-application/internal/pkg/id"
 	"strings"
 	"testing"
@@ -36,7 +34,7 @@ func TestDecodeUpdateProgramVersionRequest(t *testing.T) {
 				"/versions/11a111cf-91f3-49dc-bb6d-ac4235635411",
 				strings.NewReader(`{"invalid`),
 			), map[string]string{"id": "11a111cf-91f3-49dc-bb6d-ac4235635411"}),
-			wantErr: xhttp.NewBadRequestError(errors.New("unexpected EOF")),
+			wantErr: ErrInvalidJson,
 		},
 		{
 			name: "invalid version id",
@@ -45,7 +43,7 @@ func TestDecodeUpdateProgramVersionRequest(t *testing.T) {
 				"/versions/invalid",
 				strings.NewReader(`{"name":"new-name"}`),
 			), map[string]string{"id": "invalid"}),
-			wantErr: xhttp.NewUnprocessableEntityError(id.ErrInvalidID),
+			wantErr: id.ErrInvalidID, // TODO return concrete id error
 		},
 		{
 			name: "invalid version name",
@@ -54,7 +52,7 @@ func TestDecodeUpdateProgramVersionRequest(t *testing.T) {
 				"/versions/11a111cf-91f3-49dc-bb6d-ac4235635411",
 				strings.NewReader(`{"name":"sh"}`),
 			), map[string]string{"id": "11a111cf-91f3-49dc-bb6d-ac4235635411"}),
-			wantErr: xhttp.NewUnprocessableEntityError(version.ErrNameLength),
+			wantErr: version.ErrNameLength,
 		},
 	}
 	for _, tt := range tests {

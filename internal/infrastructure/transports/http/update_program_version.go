@@ -31,18 +31,19 @@ type updateProgramVersionRequestDTO struct {
 func decodeUpdateProgramVersionRequest(_ context.Context, req *http.Request) (interface{}, error) {
 	id, err := version.NewID(mux.Vars(req)["id"])
 	if err != nil {
-		return nil, xhttp.NewUnprocessableEntityError(err)
+		return nil, err
 	}
 
 	dto := updateProgramVersionRequestDTO{}
 	err = json.NewDecoder(req.Body).Decode(&dto)
 	if err != nil {
-		return nil, xhttp.NewBadRequestError(err)
+		// TODO log original error https://github.com/SmotrovaLilit/golang-reference-application/issues/2
+		return nil, ErrInvalidJson
 	}
 
 	name, err := version.NewName(dto.Name)
 	if err != nil {
-		return nil, xhttp.NewUnprocessableEntityError(err)
+		return nil, err
 	}
 
 	return updateprogramversion.NewCommand(id, name), nil

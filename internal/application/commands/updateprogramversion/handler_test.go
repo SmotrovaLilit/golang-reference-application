@@ -101,7 +101,7 @@ func TestHandler_HandleErrorFromDomainUpdateVersion(t *testing.T) {
 	err := handler.Handle(context.TODO(), cmd)
 
 	// Test assertions
-	require.ErrorIs(t, err, version.ErrUpdateStatus)
+	require.ErrorIs(t, err, version.ErrUpdateVersionStatus)
 	_version := versionRepository.FindByID(context.Background(), versionID)
 	require.NotNil(t, _version)
 	require.Equal(t, versionOldName, _version.Name())
