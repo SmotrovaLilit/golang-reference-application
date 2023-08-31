@@ -2,16 +2,15 @@ package http
 
 import (
 	"context"
-	stdErrors "errors"
+	"errors"
 	kithttp "github.com/go-kit/kit/transport/http"
 	"github.com/gorilla/mux"
 	"net/http"
 	"reference-application/internal/application"
-	"reference-application/internal/application/commands/updateprogramversion"
 	"reference-application/internal/domain/program"
 	"reference-application/internal/domain/version"
+	"reference-application/internal/pkg/errorswithcode"
 	xhttp "reference-application/internal/pkg/http"
-	"reference-application/internal/pkg/id"
 )
 
 // NewHandler creates a new http.Handler.
@@ -33,29 +32,31 @@ func errorEncoder(ctx context.Context, err error, w http.ResponseWriter) {
 	xhttp.ErrorEncoder(ctx, convertErrorToApiError(err), w)
 }
 
+// ErrInvalidJson is an errors for invalid json.
+var ErrInvalidJson = errorswithcode.New("invalid json", "INVALID_JSON")
+
 // convertErrorToApiError converts an error to an API error with status code.
 // If error is unknown, then it returns an internal error.
-func convertErrorToApiError(err error) error {
+func convertErrorToApiError(err error) *xhttp.ApiError {
 	if err == nil {
-		return nil
+		panic("convert error to ApiError: err is nil")
 	}
+
 	switch true {
-	// TODO может коды ошибок тоже тут формировать?? чтобы легче было с врапами ошибок
-	case stdErrors.Is(err, version.ErrUpdateVersionStatus):
-		err = xhttp.NewUnprocessableEntityError(err)
-	case stdErrors.Is(err, updateprogramversion.ErrVersionNotFound):
-		err = xhttp.NewNotFoundError(err)
-	case stdErrors.Is(err, program.ErrInvalidPlatformCode):
-		err = xhttp.NewUnprocessableEntityError(err)
-	case stdErrors.Is(err, id.ErrInvalidID):
-		err = xhttp.NewUnprocessableEntityError(err)
-	case stdErrors.Is(err, version.ErrNameLength):
-		err = xhttp.NewUnprocessableEntityError(err)
-	case stdErrors.Is(err, ErrInvalidJson):
-		err = xhttp.NewBadRequestError(err)
+	case errors.As(err, new(*errorswithcode.NotFoundError)):
+		return xhttp.NewNotFoundError(err)
+
+	case errors.Is(err, version.ErrInvalidID),
+		errors.Is(err, version.ErrNameLength),
+		errors.Is(err, version.ErrUpdateVersionStatus),
+		errors.Is(err, program.ErrInvalidID),
+		errors.Is(err, program.ErrInvalidPlatformCode):
+		return xhttp.NewUnprocessableEntityError(err)
+
+	case errors.Is(err, ErrInvalidJson):
+		return xhttp.NewBadRequestError(err)
 	default:
 		// TODO log original error
-		err = xhttp.ErrInternal
+		return xhttp.ErrInternal
 	}
-	return err
 }

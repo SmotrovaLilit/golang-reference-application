@@ -3,7 +3,14 @@ package http
 import (
 	"errors"
 	"net/http"
-	errorswithcode "reference-application/internal/pkg/errors"
+	"reference-application/internal/pkg/errorswithcode"
+)
+
+const (
+	badRequestCode          = "BAD_REQUEST"
+	unprocessableEntityCode = "UNPROCESSABLE_ENTITY"
+	notFoundCode            = "NOT_FOUND"
+	internalServerError     = "INTERNAL_SERVER_ERROR"
 )
 
 var (
@@ -11,7 +18,7 @@ var (
 	ErrInternal = NewApiError(
 		http.StatusInternalServerError,
 		http.StatusText(http.StatusInternalServerError),
-		"INTERNAL_SERVER_ERROR",
+		internalServerError,
 	)
 )
 
@@ -31,31 +38,28 @@ func NewApiError(statusCode int, message string, code string) *ApiError {
 	}
 }
 
-// NewBadRequestError creates a new bad request errors.
-func NewBadRequestError(err error) *ApiError {
+// NewApiErrorFromError creates a new API errors from an error.
+func NewApiErrorFromError(statusCode int, err error, defaultCode string) *ApiError {
 	var errorWithCode *errorswithcode.Error
 	if errors.As(err, &errorWithCode) {
-		return NewApiError(http.StatusBadRequest, errorWithCode.Message, errorWithCode.Code)
+		return NewApiError(statusCode, err.Error(), errorWithCode.Code)
 	}
-	return NewApiError(http.StatusBadRequest, err.Error(), "BAD_REQUEST")
+	return NewApiError(statusCode, err.Error(), defaultCode)
+}
+
+// NewBadRequestError creates a new bad request errors.
+func NewBadRequestError(err error) *ApiError {
+	return NewApiErrorFromError(http.StatusBadRequest, err, badRequestCode)
 }
 
 // NewUnprocessableEntityError creates a new unprocessable entity errors.
 func NewUnprocessableEntityError(err error) *ApiError {
-	var errorWithCode *errorswithcode.Error
-	if errors.As(err, &errorWithCode) {
-		return NewApiError(http.StatusUnprocessableEntity, errorWithCode.Message, errorWithCode.Code)
-	}
-	return NewApiError(http.StatusUnprocessableEntity, err.Error(), "UNPROCESSABLE_ENTITY")
+	return NewApiErrorFromError(http.StatusUnprocessableEntity, err, unprocessableEntityCode)
 }
 
 // NewNotFoundError creates a new not found errors.
 func NewNotFoundError(err error) *ApiError {
-	var errorWithCode *errorswithcode.Error
-	if errors.As(err, &errorWithCode) {
-		return NewApiError(http.StatusNotFound, errorWithCode.Message, errorWithCode.Code)
-	}
-	return NewApiError(http.StatusNotFound, err.Error(), "NOT_FOUND")
+	return NewApiErrorFromError(http.StatusNotFound, err, notFoundCode)
 }
 
 // ApiError returns the errors message.
