@@ -4,7 +4,6 @@ import (
 	"context"
 	"github.com/stretchr/testify/require"
 	"reference-application/internal/application/commands/updateprogramversion"
-	"reference-application/internal/domain/program"
 	"reference-application/internal/domain/version"
 	"reference-application/internal/infrastructure/repositories"
 	"reference-application/internal/pkg/tests"
@@ -14,35 +13,24 @@ import (
 func TestHandler_Handle(t *testing.T) {
 	dbTest := tests.PrepareTestWithDatabase(t)
 	versionRepository := repositories.NewVersionRepository(dbTest.DB)
-	programRepository := repositories.NewProgramRepository(dbTest.DB)
 	handler := updateprogramversion.Handler{
 		Repository: versionRepository,
 	}
 
 	// Prepare test data
-	versionID := version.MustNewID("11a111cf-91f3-49dc-bb6d-ac4235635411")
 	versionNewName := version.MustNewName("new-name")
-	programID := program.MustNewID("ecaffa6e-4302-4a46-ae72-44a7bd20dfd5")
-	programRepository.Save(context.TODO(), program.NewProgram(
-		programID,
-		program.AndroidPlatformCode,
-	))
-	versionRepository.Save(context.TODO(), version.NewVersion(
-		versionID,
-		version.MustNewName("smart-calculator"),
-		programID,
-	))
+	existingVersion := dbTest.PrepareDraftVersion(t)
 
 	// Tested operation
 	cmd := updateprogramversion.NewCommand(
-		versionID,
+		existingVersion.ID(),
 		versionNewName,
 	)
 	err := handler.Handle(context.TODO(), cmd)
 
 	// Test assertions
 	require.NoError(t, err)
-	_version := versionRepository.FindByID(context.Background(), versionID)
+	_version := versionRepository.FindByID(context.Background(), existingVersion.ID())
 	require.NotNil(t, _version)
 	require.Equal(t, versionNewName, _version.Name())
 }
@@ -55,7 +43,8 @@ func TestHandler_HandleVersionNotFound(t *testing.T) {
 	}
 
 	// Prepare test data
-	versionID := version.MustNewID("11a111cf-91f3-49dc-bb6d-ac4235635411")
+	_version, _ := tests.NewDraftVersion()
+	versionID := _version.ID()
 	versionNewName := version.MustNewName("new-name")
 
 	// Tested operation
@@ -72,37 +61,25 @@ func TestHandler_HandleVersionNotFound(t *testing.T) {
 func TestHandler_HandleErrorFromDomainUpdateVersion(t *testing.T) {
 	dbTest := tests.PrepareTestWithDatabase(t)
 	versionRepository := repositories.NewVersionRepository(dbTest.DB)
-	programRepository := repositories.NewProgramRepository(dbTest.DB)
 	handler := updateprogramversion.Handler{
 		Repository: versionRepository,
 	}
 
 	// Prepare test data
-	versionID := version.MustNewID("11a111cf-91f3-49dc-bb6d-ac4235635411")
+	existingVersion := dbTest.PrepareVersionOnReview(t)
 	versionNewName := version.MustNewName("new-name")
-	versionOldName := version.MustNewName("smart-calculator")
-	programID := program.MustNewID("ecaffa6e-4302-4a46-ae72-44a7bd20dfd5")
-	programRepository.Save(context.TODO(), program.NewProgram(
-		programID,
-		program.AndroidPlatformCode,
-	))
-	versionRepository.Save(context.TODO(), version.NewExistingVersion(
-		versionID,
-		versionOldName,
-		programID,
-		version.OnReviewStatus,
-	))
+	versionOldName := existingVersion.Name()
 
 	// Tested operation
 	cmd := updateprogramversion.NewCommand(
-		versionID,
+		existingVersion.ID(),
 		versionNewName,
 	)
 	err := handler.Handle(context.TODO(), cmd)
 
 	// Test assertions
 	require.ErrorIs(t, err, version.ErrUpdateVersionStatus)
-	_version := versionRepository.FindByID(context.Background(), versionID)
+	_version := versionRepository.FindByID(context.Background(), existingVersion.ID())
 	require.NotNil(t, _version)
 	require.Equal(t, versionOldName, _version.Name())
 }

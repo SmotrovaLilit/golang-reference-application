@@ -13,6 +13,7 @@ import (
 	"net"
 	"os"
 	"os/exec"
+	"reference-application/internal/domain/version"
 	"reference-application/internal/infrastructure/repositories"
 	"testing"
 	"time"
@@ -23,6 +24,26 @@ const binPath = "../../cmd/server"
 type IntegrationTest struct {
 	TestWithDatabase
 	Addr string
+}
+
+// PrepareDraftVersion creates a version in the database and returns it.
+func (tdb TestWithDatabase) PrepareDraftVersion(t *testing.T) version.Version {
+	_version, _program := NewDraftVersion()
+	versionRepository := repositories.NewVersionRepository(tdb.DB)
+	programRepository := repositories.NewProgramRepository(tdb.DB)
+	programRepository.Save(context.TODO(), _program)
+	versionRepository.Save(context.TODO(), _version)
+	return _version
+}
+
+// PrepareVersionOnReview creates a version in the database and returns it.
+func (tdb TestWithDatabase) PrepareVersionOnReview(t *testing.T) version.Version {
+	_version, _program := NewOnReviewVersion()
+	versionRepository := repositories.NewVersionRepository(tdb.DB)
+	programRepository := repositories.NewProgramRepository(tdb.DB)
+	programRepository.Save(context.TODO(), _program)
+	versionRepository.Save(context.TODO(), _version)
+	return _version
 }
 
 // PrepareIntegrationTest starts the server and returns the address of the server and a database connection.
