@@ -7,6 +7,8 @@ import (
 
 // VersionRepository is a repository to save a program versions.
 type VersionRepository interface {
-	// Save saves a program.
+	// Save saves a version.
 	Save(ctx context.Context, version version.Version)
+	// FindByID finds a version by ID.
+	FindByID(ctx context.Context, id version.ID) *version.Version
 }

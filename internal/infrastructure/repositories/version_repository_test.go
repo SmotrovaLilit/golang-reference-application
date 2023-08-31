@@ -5,6 +5,7 @@ import (
 	"errors"
 	"github.com/DATA-DOG/go-sqlmock"
 	"github.com/stretchr/testify/require"
+	"gorm.io/gorm"
 	"reference-application/internal/domain/version"
 	"reference-application/internal/infrastructure/repositories"
 	"reference-application/internal/pkg/tests"
@@ -91,6 +92,20 @@ func TestVersionRepository_FindByID_Error(t *testing.T) {
 	require.Panics(t, func() {
 		versionRepository.FindByID(context.Background(), testVersionID)
 	})
+
+	require.NoError(t, test.ExpectationsWereMet())
+}
+
+func TestVersionRepository_FindByID_NotFound(t *testing.T) {
+	test := tests.PrepareTestWithMockedDatabase(t)
+	versionRepository := repositories.NewVersionRepository(test.DB)
+
+	test.ExpectQuery(`SELECT \* FROM "versions"`).
+		WithArgs(testVersionID.String()).
+		WillReturnError(gorm.ErrRecordNotFound)
+
+	v := versionRepository.FindByID(context.Background(), testVersionID)
+	require.Nil(t, v)
 
 	require.NoError(t, test.ExpectationsWereMet())
 }

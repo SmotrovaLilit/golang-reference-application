@@ -53,3 +53,17 @@ func (v *Version) ProgramID() program.ID {
 func (v *Version) Status() Status {
 	return v.status
 }
+
+// UpdateName updates a version name.
+func (v *Version) UpdateName(value Name) error {
+	if err := v.canUpdate(); err != nil {
+		return err
+	}
+	v.name = value
+	return nil
+}
+
+// canUpdate checks if a version can be updated.
+func (v *Version) canUpdate() error {
+	return v.status.canUpdate()
+}

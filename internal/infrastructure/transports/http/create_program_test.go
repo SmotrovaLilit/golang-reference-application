@@ -2,14 +2,11 @@ package http
 
 import (
 	"context"
-	"errors"
 	"github.com/stretchr/testify/require"
 	"net/http"
 	"net/http/httptest"
 	"reference-application/internal/domain/program"
 	"reference-application/internal/domain/version"
-	xhttp "reference-application/internal/pkg/http"
-	"reference-application/internal/pkg/id"
 	"strings"
 	"testing"
 )
@@ -36,7 +33,7 @@ func TestDecodeCreateProgramRequest(t *testing.T) {
 				"/programs",
 				strings.NewReader(`{"invalid`),
 			),
-			wantErr: xhttp.NewBadRequestError(errors.New("unexpected EOF")),
+			wantErr: errInvalidJson,
 		},
 		{
 			name: "invalid program id",
@@ -45,7 +42,7 @@ func TestDecodeCreateProgramRequest(t *testing.T) {
 				"/programs",
 				strings.NewReader(`{"id":"invalid","platform_code":"ANDROID"}`),
 			),
-			wantErr: xhttp.NewUnprocessableEntityError(id.ErrInvalidID),
+			wantErr: program.ErrInvalidID,
 		},
 		{
 			name: "invalid platform code",
@@ -54,7 +51,7 @@ func TestDecodeCreateProgramRequest(t *testing.T) {
 				"/programs",
 				strings.NewReader(`{"id":"3BA2DA12-CF71-49BD-A753-48BE34CD848D","platform_code":"invalid"}`),
 			),
-			wantErr: xhttp.NewUnprocessableEntityError(program.ErrInvalidPlatformCode),
+			wantErr: program.ErrInvalidPlatformCode,
 		},
 		{
 			name: "without version",
@@ -63,7 +60,7 @@ func TestDecodeCreateProgramRequest(t *testing.T) {
 				"/programs",
 				strings.NewReader(`{"id":"3BA2DA12-CF71-49BD-A753-48BE34CD848D","platform_code":"ANDROID"}`),
 			),
-			wantErr: xhttp.NewUnprocessableEntityError(id.ErrInvalidID),
+			wantErr: version.ErrInvalidID,
 		},
 		{
 			name: "invalid version id",
@@ -72,7 +69,7 @@ func TestDecodeCreateProgramRequest(t *testing.T) {
 				"/programs",
 				strings.NewReader(`{"id":"3BA2DA12-CF71-49BD-A753-48BE34CD848D","platform_code":"ANDROID", "version":{"id":"invalid","name":"smart-calculator"}}`),
 			),
-			wantErr: xhttp.NewUnprocessableEntityError(id.ErrInvalidID),
+			wantErr: version.ErrInvalidID,
 		},
 		{
 			name: "invalid version name",
@@ -81,7 +78,7 @@ func TestDecodeCreateProgramRequest(t *testing.T) {
 				"/programs",
 				strings.NewReader(`{"id":"3BA2DA12-CF71-49BD-A753-48BE34CD848D","platform_code":"ANDROID", "version":{"id":"11A111CF-91F3-49DC-BB6D-AC4235635411","name":"sh"}}`),
 			),
-			wantErr: xhttp.NewUnprocessableEntityError(version.ErrNameLength),
+			wantErr: version.ErrNameLength,
 		},
 	}
 	for _, tt := range tests {
@@ -91,7 +88,8 @@ func TestDecodeCreateProgramRequest(t *testing.T) {
 				require.NoError(t, err)
 				return
 			}
-			require.Equal(t, tt.wantErr, err)
+			require.ErrorIs(t, err, tt.wantErr)
+			// TODO check that the command is created correctly https://github.com/SmotrovaLilit/golang-reference-application/issues/16
 		})
 	}
 }

@@ -2,7 +2,6 @@ package http
 
 import (
 	"context"
-	"errors"
 	"github.com/stretchr/testify/require"
 	"net/http"
 	"net/http/httptest"
@@ -11,7 +10,7 @@ import (
 
 func TestErrorEncoder(t *testing.T) {
 	type args struct {
-		err error
+		err *ApiError
 	}
 	tests := []struct {
 		name           string
@@ -24,12 +23,6 @@ func TestErrorEncoder(t *testing.T) {
 			args:           args{err: NewApiError(http.StatusBadRequest, "message", "CODE")},
 			wantStatusCode: http.StatusBadRequest,
 			wantBody:       `{"error":"message","code":"CODE"}` + "\n",
-		},
-		{
-			name:           "success to encode unknown errors",
-			args:           args{err: errors.New("message")},
-			wantStatusCode: http.StatusInternalServerError,
-			wantBody:       `{"error":"Internal Server Error","code":"INTERNAL_SERVER_ERROR"}` + "\n",
 		},
 	}
 	for _, tt := range tests {

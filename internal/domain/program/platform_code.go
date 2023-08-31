@@ -1,9 +1,9 @@
 package program
 
-import "reference-application/internal/pkg/errors"
+import "reference-application/internal/pkg/errorswithcode"
 
 // ErrInvalidPlatformCode is an errors for invalid platform code.
-var ErrInvalidPlatformCode = errors.New("invalid program platform code", "INVALID_PROGRAM_PLATFORM_CODE")
+var ErrInvalidPlatformCode = errorswithcode.NewValidationErrorWithCode("invalid program platform code", "INVALID_PROGRAM_PLATFORM_CODE")
 
 const (
 	// AndroidPlatformCode is a constant for android platform code.

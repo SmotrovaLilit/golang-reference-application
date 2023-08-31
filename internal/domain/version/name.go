@@ -2,11 +2,11 @@ package version
 
 import (
 	"fmt"
-	"reference-application/internal/pkg/errors"
+	"reference-application/internal/pkg/errorswithcode"
 )
 
 // ErrNameLength is an error for invalid version name length.
-var ErrNameLength = errors.New("invalid version name length", "INVALID_VERSION_NAME_LENGTH")
+var ErrNameLength = errorswithcode.NewValidationErrorWithCode("invalid version name length", "INVALID_VERSION_NAME_LENGTH")
 
 // Name is a type for version name.
 type Name string
