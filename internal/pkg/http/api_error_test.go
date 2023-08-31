@@ -30,12 +30,12 @@ func TestNewUnprocessableEntityError(t *testing.T) {
 			args: args{
 				err: errors.New("MESSAGE"),
 			},
-			want: NewApiError(http.StatusUnprocessableEntity, "MESSAGE", "UNPROCESSABLE_ENTITY"),
+			want: NewApiError(http.StatusUnprocessableEntity, "MESSAGE", "VALIDATION_ERROR"),
 		},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			got := NewUnprocessableEntityError(tt.args.err)
+			got := NewValidationError(tt.args.err)
 			require.Equal(t, tt.want, got)
 		})
 	}

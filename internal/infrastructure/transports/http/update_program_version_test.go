@@ -33,7 +33,7 @@ func TestDecodeUpdateProgramVersionRequest(t *testing.T) {
 				"/versions/11a111cf-91f3-49dc-bb6d-ac4235635411",
 				strings.NewReader(`{"invalid`),
 			), map[string]string{"id": "11a111cf-91f3-49dc-bb6d-ac4235635411"}),
-			wantErr: ErrInvalidJson,
+			wantErr: errInvalidJson,
 		},
 		{
 			name: "invalid version id",

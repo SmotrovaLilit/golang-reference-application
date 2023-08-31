@@ -6,7 +6,7 @@ import (
 )
 
 // ErrInvalidID is error for invalid version identifier.
-var ErrInvalidID = errorswithcode.New("invalid version id", "INVALID_VERSION_ID")
+var ErrInvalidID = errorswithcode.NewValidationErrorWithCode("invalid version id", "INVALID_VERSION_ID")
 
 // NewID is a constructor for ID.
 // It returns error if version identifier is invalid.

@@ -7,10 +7,10 @@ import (
 )
 
 const (
-	badRequestCode          = "BAD_REQUEST"
-	unprocessableEntityCode = "UNPROCESSABLE_ENTITY"
-	notFoundCode            = "NOT_FOUND"
-	internalServerError     = "INTERNAL_SERVER_ERROR"
+	badRequestCode      = "BAD_REQUEST"
+	validationErrorCode = "VALIDATION_ERROR"
+	notFoundCode        = "NOT_FOUND"
+	internalServerError = "INTERNAL_SERVER_ERROR"
 )
 
 var (
@@ -52,9 +52,9 @@ func NewBadRequestError(err error) *ApiError {
 	return NewApiErrorFromError(http.StatusBadRequest, err, badRequestCode)
 }
 
-// NewUnprocessableEntityError creates a new unprocessable entity errors.
-func NewUnprocessableEntityError(err error) *ApiError {
-	return NewApiErrorFromError(http.StatusUnprocessableEntity, err, unprocessableEntityCode)
+// NewValidationError creates a new unprocessable entity errors.
+func NewValidationError(err error) *ApiError {
+	return NewApiErrorFromError(http.StatusUnprocessableEntity, err, validationErrorCode)
 }
 
 // NewNotFoundError creates a new not found errors.

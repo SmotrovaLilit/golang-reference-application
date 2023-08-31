@@ -38,7 +38,7 @@ func decodeUpdateProgramVersionRequest(_ context.Context, req *http.Request) (in
 	err = json.NewDecoder(req.Body).Decode(&dto)
 	if err != nil {
 		// TODO log original error https://github.com/SmotrovaLilit/golang-reference-application/issues/2
-		return nil, ErrInvalidJson
+		return nil, errInvalidJson
 	}
 
 	name, err := version.NewName(dto.Name)

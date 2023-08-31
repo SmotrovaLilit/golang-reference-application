@@ -39,7 +39,7 @@ func decodeCreateProgramRequest(_ context.Context, request *http.Request) (inter
 	err := json.NewDecoder(request.Body).Decode(&dto)
 	if err != nil {
 		// TODO log original error  https://github.com/SmotrovaLilit/golang-reference-application/issues/2
-		return nil, ErrInvalidJson
+		return nil, errInvalidJson
 	}
 	_id, err := program.NewID(dto.ID)
 	if err != nil {

@@ -33,7 +33,7 @@ func TestDecodeCreateProgramRequest(t *testing.T) {
 				"/programs",
 				strings.NewReader(`{"invalid`),
 			),
-			wantErr: ErrInvalidJson,
+			wantErr: errInvalidJson,
 		},
 		{
 			name: "invalid program id",

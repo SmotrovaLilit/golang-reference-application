@@ -7,8 +7,6 @@ import (
 	"github.com/gorilla/mux"
 	"net/http"
 	"reference-application/internal/application"
-	"reference-application/internal/domain/program"
-	"reference-application/internal/domain/version"
 	"reference-application/internal/pkg/errorswithcode"
 	xhttp "reference-application/internal/pkg/http"
 )
@@ -32,8 +30,8 @@ func errorEncoder(ctx context.Context, err error, w http.ResponseWriter) {
 	xhttp.ErrorEncoder(ctx, convertErrorToApiError(err), w)
 }
 
-// ErrInvalidJson is an errors for invalid json.
-var ErrInvalidJson = errorswithcode.New("invalid json", "INVALID_JSON")
+// errInvalidJson is an errors for invalid json.
+var errInvalidJson = errorswithcode.New("invalid json", "INVALID_JSON")
 
 // convertErrorToApiError converts an error to an API error with status code.
 // If error is unknown, then it returns an internal error.
@@ -45,18 +43,12 @@ func convertErrorToApiError(err error) *xhttp.ApiError {
 	switch true {
 	case errors.As(err, new(*errorswithcode.NotFoundError)):
 		return xhttp.NewNotFoundError(err)
-
-	case errors.Is(err, version.ErrInvalidID),
-		errors.Is(err, version.ErrNameLength),
-		errors.Is(err, version.ErrUpdateVersionStatus),
-		errors.Is(err, program.ErrInvalidID),
-		errors.Is(err, program.ErrInvalidPlatformCode):
-		return xhttp.NewUnprocessableEntityError(err)
-
-	case errors.Is(err, ErrInvalidJson):
+	case errors.As(err, new(*errorswithcode.ValidationError)):
+		return xhttp.NewValidationError(err)
+	case errors.Is(err, errInvalidJson):
 		return xhttp.NewBadRequestError(err)
 	default:
-		// TODO log original error
+		// TODO log original error https://github.com/SmotrovaLilit/golang-reference-application/issues/2
 		return xhttp.ErrInternal
 	}
 }
