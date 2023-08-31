@@ -1,9 +1,9 @@
 package version
 
-import "reference-application/internal/pkg/errors"
+import "reference-application/internal/pkg/errorswithcode"
 
 var (
-	ErrUpdateVersionStatus = errors.New("invalid status to update version", "INVALID_STATUS_TO_UPDATE")
+	ErrUpdateVersionStatus = errorswithcode.New("invalid status to update version", "INVALID_STATUS_TO_UPDATE")
 )
 
 // Status is a type for a version status.

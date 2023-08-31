@@ -1,4 +1,4 @@
-package errors
+package errorswithcode
 
 // Error is an errors with a message and a code.
 type Error struct {

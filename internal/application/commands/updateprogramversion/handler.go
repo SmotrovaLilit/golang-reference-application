@@ -6,11 +6,11 @@ import (
 	"github.com/google/wire"
 	"reference-application/internal/application/interfaces/repositories"
 	"reference-application/internal/domain/version"
-	"reference-application/internal/pkg/errors"
+	"reference-application/internal/pkg/errorswithcode"
 )
 
 // ErrVersionNotFound is a version not found errors.
-var ErrVersionNotFound = errors.New("version not found", "NOT_FOUND")
+var ErrVersionNotFound = errorswithcode.NewNotFound("version not found")
 
 var Set = wire.NewSet(
 	wire.Struct(new(Handler), "*"),
