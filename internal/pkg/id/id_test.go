@@ -3,6 +3,7 @@ package id
 import (
 	"github.com/google/uuid"
 	"github.com/stretchr/testify/require"
+	"reference-application/internal/pkg/errorswithcode"
 	"testing"
 )
 
@@ -10,8 +11,8 @@ type testID struct {
 	Base
 }
 
-var newTestID = New[*testID]
-var mustNewTestID = MustNew[*testID]
+var testErrInvalidID = errorswithcode.New("invalid test id", "INVALID_TEST_ID")
+var newTestID, mustNewTestID = ConstructorsFactory[*testID](testErrInvalidID)
 
 func TestParse(t *testing.T) {
 	type args struct {

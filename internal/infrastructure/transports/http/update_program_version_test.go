@@ -7,7 +7,6 @@ import (
 	"net/http"
 	"net/http/httptest"
 	"reference-application/internal/domain/version"
-	"reference-application/internal/pkg/id"
 	"strings"
 	"testing"
 )
@@ -43,7 +42,7 @@ func TestDecodeUpdateProgramVersionRequest(t *testing.T) {
 				"/versions/invalid",
 				strings.NewReader(`{"name":"new-name"}`),
 			), map[string]string{"id": "invalid"}),
-			wantErr: id.ErrInvalidID, // TODO return concrete id error
+			wantErr: version.ErrInvalidID,
 		},
 		{
 			name: "invalid version name",
@@ -58,7 +57,7 @@ func TestDecodeUpdateProgramVersionRequest(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			_, err := decodeUpdateProgramVersionRequest(context.TODO(), tt.request)
-			require.Equal(t, tt.wantErr, err)
+			require.ErrorIs(t, err, tt.wantErr)
 			// TODO check that the command is created correctly https://github.com/SmotrovaLilit/golang-reference-application/issues/16
 		})
 	}

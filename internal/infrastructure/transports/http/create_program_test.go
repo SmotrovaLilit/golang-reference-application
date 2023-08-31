@@ -7,7 +7,6 @@ import (
 	"net/http/httptest"
 	"reference-application/internal/domain/program"
 	"reference-application/internal/domain/version"
-	"reference-application/internal/pkg/id"
 	"strings"
 	"testing"
 )
@@ -43,7 +42,7 @@ func TestDecodeCreateProgramRequest(t *testing.T) {
 				"/programs",
 				strings.NewReader(`{"id":"invalid","platform_code":"ANDROID"}`),
 			),
-			wantErr: id.ErrInvalidID,
+			wantErr: program.ErrInvalidID,
 		},
 		{
 			name: "invalid platform code",
@@ -61,7 +60,7 @@ func TestDecodeCreateProgramRequest(t *testing.T) {
 				"/programs",
 				strings.NewReader(`{"id":"3BA2DA12-CF71-49BD-A753-48BE34CD848D","platform_code":"ANDROID"}`),
 			),
-			wantErr: id.ErrInvalidID,
+			wantErr: version.ErrInvalidID,
 		},
 		{
 			name: "invalid version id",
@@ -70,7 +69,7 @@ func TestDecodeCreateProgramRequest(t *testing.T) {
 				"/programs",
 				strings.NewReader(`{"id":"3BA2DA12-CF71-49BD-A753-48BE34CD848D","platform_code":"ANDROID", "version":{"id":"invalid","name":"smart-calculator"}}`),
 			),
-			wantErr: id.ErrInvalidID,
+			wantErr: version.ErrInvalidID,
 		},
 		{
 			name: "invalid version name",
@@ -89,7 +88,7 @@ func TestDecodeCreateProgramRequest(t *testing.T) {
 				require.NoError(t, err)
 				return
 			}
-			require.ErrorIs(t, tt.wantErr, err)
+			require.ErrorIs(t, err, tt.wantErr)
 			// TODO check that the command is created correctly https://github.com/SmotrovaLilit/golang-reference-application/issues/16
 		})
 	}
