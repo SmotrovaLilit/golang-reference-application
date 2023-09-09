@@ -6,6 +6,7 @@ import (
 	"reference-application/internal/application/commands/updateprogramversion"
 	"reference-application/internal/domain/version"
 	"reference-application/internal/infrastructure/repositories"
+	"reference-application/internal/pkg/optional"
 	"reference-application/internal/pkg/tests"
 	"testing"
 )
@@ -19,12 +20,16 @@ func TestHandler_Handle(t *testing.T) {
 
 	// Prepare test data
 	versionNewName := version.MustNewName("new-name")
+	newDescription := optional.Of[version.Description](version.MustNewDescription("new-description"))
+	newNumber := optional.Of[version.Number](version.MustNewNumber("1.0.1"))
 	existingVersion := dbTest.PrepareDraftVersion(t)
 
 	// Tested operation
 	cmd := updateprogramversion.NewCommand(
 		existingVersion.ID(),
 		versionNewName,
+		newDescription,
+		newNumber,
 	)
 	err := handler.Handle(context.TODO(), cmd)
 
@@ -33,6 +38,9 @@ func TestHandler_Handle(t *testing.T) {
 	_version := versionRepository.FindByID(context.Background(), existingVersion.ID())
 	require.NotNil(t, _version)
 	require.Equal(t, versionNewName, _version.Name())
+	require.Equal(t, versionNewName, _version.Name())
+	require.Equal(t, newDescription, _version.Description())
+	require.Equal(t, newNumber, _version.Number())
 }
 
 func TestHandler_HandleVersionNotFound(t *testing.T) {
@@ -51,6 +59,8 @@ func TestHandler_HandleVersionNotFound(t *testing.T) {
 	cmd := updateprogramversion.NewCommand(
 		versionID,
 		versionNewName,
+		optional.Empty[version.Description](),
+		optional.Empty[version.Number](),
 	)
 	err := handler.Handle(context.TODO(), cmd)
 
@@ -74,6 +84,8 @@ func TestHandler_HandleErrorFromDomainUpdateVersion(t *testing.T) {
 	cmd := updateprogramversion.NewCommand(
 		existingVersion.ID(),
 		versionNewName,
+		optional.Empty[version.Description](),
+		optional.Empty[version.Number](),
 	)
 	err := handler.Handle(context.TODO(), cmd)
 

@@ -7,6 +7,7 @@ import (
 	"reference-application/internal/application/interfaces/repositories"
 	"reference-application/internal/domain/version"
 	"reference-application/internal/pkg/errorswithcode"
+	"reference-application/internal/pkg/optional"
 )
 
 // ErrVersionNotFound is a version not found errors.
@@ -19,8 +20,10 @@ var Set = wire.NewSet(
 
 // Command is a command to update a version.
 type Command struct {
-	ID   version.ID
-	name version.Name
+	ID          version.ID
+	name        version.Name
+	description optional.Optional[version.Description]
+	number      optional.Optional[version.Number]
 }
 
 // Handler is a handler to update a version.
@@ -29,10 +32,17 @@ type Handler struct {
 }
 
 // NewCommand is a constructor for Command.
-func NewCommand(id version.ID, name version.Name) Command {
+func NewCommand(
+	id version.ID,
+	name version.Name,
+	description optional.Optional[version.Description],
+	number optional.Optional[version.Number],
+) Command {
 	return Command{
-		ID:   id,
-		name: name,
+		ID:          id,
+		name:        name,
+		description: description,
+		number:      number,
 	}
 }
 
@@ -42,7 +52,7 @@ func (h Handler) Handle(ctx context.Context, cmd Command) error {
 	if _version == nil {
 		return ErrVersionNotFound
 	}
-	err := _version.UpdateName(cmd.name)
+	err := _version.Update(cmd.name, cmd.description, cmd.number)
 	if err != nil {
 		return err
 	}

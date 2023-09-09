@@ -3,18 +3,62 @@ package version
 import (
 	"github.com/stretchr/testify/require"
 	"reference-application/internal/domain/program"
+	"reference-application/internal/pkg/optional"
 	"testing"
 )
 
-func TestVersion_UpdateName(t *testing.T) {
+func TestNewVersion(t *testing.T) {
+	id := MustNewID("11a111cf-91f3-49dc-bb6d-ac4235635411")
+	programID := program.MustNewID("ecaffa6e-4302-4a46-ae72-44a7bd20dfd5")
+	name := MustNewName("name")
+	got := NewVersion(id, name, programID)
+	require.True(t, got.Status().IsDraft())
+	require.Equal(t, id, got.ID())
+	require.Equal(t, name, got.Name())
+	require.Equal(t, programID, got.ProgramID())
+	require.True(t, got.Description().IsEmpty())
+	require.True(t, got.Number().IsEmpty())
+}
+
+func TestNewExistingVersion(t *testing.T) {
+	id := MustNewID("11a111cf-91f3-49dc-bb6d-ac4235635411")
+	programID := program.MustNewID("ecaffa6e-4302-4a46-ae72-44a7bd20dfd5")
+	name := MustNewName("name")
+	description := MustNewDescription("so long description")
+	number := MustNewNumber("1.0.0")
+
+	got := NewExistingVersion(
+		id,
+		name,
+		programID,
+		OnReviewStatus,
+		optional.Of[Description](description),
+		optional.Of[Number](number),
+	)
+
+	require.Equal(t, OnReviewStatus, got.Status())
+	require.Equal(t, id, got.ID())
+	require.Equal(t, name, got.Name())
+	require.Equal(t, programID, got.ProgramID())
+	require.True(t, got.Description().IsPresent())
+	require.Equal(t, description, got.Description().Value())
+	require.True(t, got.Number().IsPresent())
+	require.Equal(t, number, got.Number().Value())
+}
+
+func TestVersion_Update(t *testing.T) {
 	type fields struct {
-		id        ID
-		name      Name
-		programID program.ID
-		status    Status
+		id          ID
+		name        Name
+		description optional.Optional[Description]
+		number      optional.Optional[Number]
+		programID   program.ID
+		status      Status
 	}
 	type args struct {
-		value Name
+		description optional.Optional[Description]
+		name        Name
+		number      optional.Optional[Number]
 	}
 	tests := []struct {
 		name    string
@@ -27,11 +71,14 @@ func TestVersion_UpdateName(t *testing.T) {
 			fields: fields{
 				id:        MustNewID("11a111cf-91f3-49dc-bb6d-ac4235635411"),
 				name:      "name",
+				number:    optional.Of[Number](MustNewNumber("1.0.0")),
 				programID: program.MustNewID("ecaffa6e-4302-4a46-ae72-44a7bd20dfd5"),
 				status:    DraftStatus,
 			},
 			args: args{
-				value: MustNewName("new-name"),
+				description: optional.Of[Description](MustNewDescription("new-description")),
+				name:        MustNewName("new-name"),
+				number:      optional.Of[Number](MustNewNumber("1.0.1")),
 			},
 			wantErr: nil,
 		},
@@ -40,11 +87,14 @@ func TestVersion_UpdateName(t *testing.T) {
 			fields: fields{
 				id:        MustNewID("11a111cf-91f3-49dc-bb6d-ac4235635411"),
 				name:      "name",
+				number:    optional.Of[Number](MustNewNumber("1.0.0")),
 				programID: program.MustNewID("ecaffa6e-4302-4a46-ae72-44a7bd20dfd5"),
-				status:    "NOT_DRAFT",
+				status:    OnReviewStatus,
 			},
 			args: args{
-				value: MustNewName("new-name"),
+				description: optional.Of[Description](MustNewDescription("new-description")),
+				name:        MustNewName("new-name"),
+				number:      optional.Of[Number](MustNewNumber("1.0.1")),
 			},
 			wantErr: ErrUpdateVersionStatus,
 		},
@@ -52,17 +102,27 @@ func TestVersion_UpdateName(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			v := &Version{
-				id:        tt.fields.id,
-				name:      tt.fields.name,
-				programID: tt.fields.programID,
-				status:    tt.fields.status,
+				id:          tt.fields.id,
+				name:        tt.fields.name,
+				description: tt.fields.description,
+				number:      tt.fields.number,
+				programID:   tt.fields.programID,
+				status:      tt.fields.status,
 			}
-			err := v.UpdateName(tt.args.value)
+			err := v.Update(
+				tt.args.name,
+				tt.args.description,
+				tt.args.number,
+			)
 			require.ErrorIs(t, err, tt.wantErr)
 			if err == nil {
-				require.Equal(t, tt.args.value, v.name)
+				require.Equal(t, tt.args.description, v.description)
+				require.Equal(t, tt.args.name, v.name)
+				require.Equal(t, tt.args.number, v.number)
 			} else {
+				require.Equal(t, tt.fields.description, v.description)
 				require.Equal(t, tt.fields.name, v.name)
+				require.Equal(t, tt.fields.number, v.number)
 			}
 		})
 	}

@@ -8,6 +8,7 @@ import (
 	"gorm.io/gorm"
 	"reference-application/internal/domain/version"
 	"reference-application/internal/infrastructure/repositories"
+	"reference-application/internal/pkg/optional"
 	"reference-application/internal/pkg/tests"
 	"testing"
 )
@@ -21,13 +22,27 @@ func TestVersionRepository_Save(t *testing.T) {
 
 	test.ExpectBegin()
 	test.ExpectExec(`UPDATE "versions"`).
-		WithArgs(testVersionName.String(), testProgramID.String(), version.DraftStatus, testVersionID.String()).
+		WithArgs(
+			testVersionName.String(),
+			testProgramID.String(),
+			version.DraftStatus,
+			"", // Description
+			"", // Number
+			testVersionID.String(),
+		).
 		WillReturnResult(sqlmock.NewResult(0, 0))
 	test.ExpectCommit()
 
 	test.ExpectBegin()
 	test.ExpectExec(`INSERT INTO "versions"`).
-		WithArgs(testVersionID.String(), testVersionName.String(), testProgramID.String(), version.DraftStatus).
+		WithArgs(
+			testVersionID.String(),
+			testVersionName.String(),
+			testProgramID.String(),
+			version.DraftStatus,
+			"", // Description
+			"", // Number
+		).
 		WillReturnResult(sqlmock.NewResult(0, 1))
 	test.ExpectCommit()
 
@@ -40,13 +55,55 @@ func TestVersionRepository_Save(t *testing.T) {
 	require.NoError(t, test.ExpectationsWereMet())
 }
 
+func TestVersionRepository_SaveWithAllFields(t *testing.T) {
+	test := tests.PrepareTestWithMockedDatabase(t)
+	versionRepository := repositories.NewVersionRepository(test.DB)
+
+	test.ExpectBegin()
+	test.ExpectExec(`UPDATE "versions"`).
+		WithArgs(
+			testVersionName.String(),
+			testProgramID.String(),
+			version.DraftStatus,
+			"so long description",
+			"1.0.0",
+			testVersionID.String(),
+		).
+		WillReturnResult(sqlmock.NewResult(0, 0))
+	test.ExpectCommit()
+
+	test.ExpectBegin()
+	test.ExpectExec(`INSERT INTO "versions"`).
+		WithArgs(
+			testVersionID.String(),
+			testVersionName.String(),
+			testProgramID.String(),
+			version.DraftStatus,
+			"so long description",
+			"1.0.0",
+		).
+		WillReturnResult(sqlmock.NewResult(0, 1))
+	test.ExpectCommit()
+
+	_version := version.NewExistingVersion(
+		testVersionID,
+		testVersionName,
+		testProgramID,
+		version.DraftStatus,
+		optional.Of[version.Description](version.MustNewDescription("so long description")),
+		optional.Of[version.Number](version.MustNewNumber("1.0.0")),
+	)
+	versionRepository.Save(context.Background(), _version)
+	require.NoError(t, test.ExpectationsWereMet())
+}
+
 func TestVersionRepository_Save_Error(t *testing.T) {
 	test := tests.PrepareTestWithMockedDatabase(t)
 	versionRepository := repositories.NewVersionRepository(test.DB)
 
 	test.ExpectBegin()
 	test.ExpectExec(`UPDATE "versions"`).
-		WithArgs(testVersionName.String(), testProgramID.String(), version.DraftStatus, testVersionID.String()).
+		WithArgs(testVersionName.String(), testProgramID.String(), version.DraftStatus, "", "", testVersionID.String()).
 		WillReturnError(errors.New("error"))
 	test.ExpectRollback()
 
@@ -69,14 +126,45 @@ func TestVersionRepository_FindByID(t *testing.T) {
 
 	test.ExpectQuery(`SELECT \* FROM "versions"`).
 		WithArgs(testVersionID.String()).
-		WillReturnRows(sqlmock.NewRows([]string{"id", "name", "program_id", "status"}).
-			AddRow(testVersionID.String(), testVersionName.String(), testProgramID.String(), "DRAFT"))
+		WillReturnRows(sqlmock.NewRows([]string{"id", "name", "program_id", "status", "description", "number"}).
+			AddRow(testVersionID.String(), testVersionName.String(), testProgramID.String(), "DRAFT", "", ""))
 
 	_version := versionRepository.FindByID(context.Background(), testVersionID)
 	require.Equal(t, testVersionID, _version.ID())
 	require.Equal(t, testVersionName, _version.Name())
 	require.Equal(t, testProgramID, _version.ProgramID())
 	require.Equal(t, version.DraftStatus, _version.Status())
+	require.True(t, _version.Description().IsEmpty())
+	require.True(t, _version.Number().IsEmpty())
+
+	require.NoError(t, test.ExpectationsWereMet())
+}
+
+func TestVersionRepository_FindByIDWithAllFields(t *testing.T) {
+	test := tests.PrepareTestWithMockedDatabase(t)
+	versionRepository := repositories.NewVersionRepository(test.DB)
+
+	test.ExpectQuery(`SELECT \* FROM "versions"`).
+		WithArgs(testVersionID.String()).
+		WillReturnRows(sqlmock.NewRows([]string{"id", "name", "program_id", "status", "description", "number"}).
+			AddRow(
+				testVersionID.String(),
+				testVersionName.String(),
+				testProgramID.String(),
+				"DRAFT",
+				"so long description",
+				"1.0.0",
+			))
+
+	_version := versionRepository.FindByID(context.Background(), testVersionID)
+	require.Equal(t, testVersionID, _version.ID())
+	require.Equal(t, testVersionName, _version.Name())
+	require.Equal(t, testProgramID, _version.ProgramID())
+	require.Equal(t, version.DraftStatus, _version.Status())
+	require.True(t, _version.Description().IsPresent())
+	require.Equal(t, "so long description", _version.Description().Value().String())
+	require.True(t, _version.Number().IsPresent())
+	require.Equal(t, "1.0.0", _version.Number().Value().String())
 
 	require.NoError(t, test.ExpectationsWereMet())
 }
