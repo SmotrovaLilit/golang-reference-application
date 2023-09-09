@@ -27,6 +27,7 @@ func newUpdateProgramVersionHandler(e updateprogramversion.Endpoint) http.Handle
 type updateProgramVersionRequestDTO struct {
 	Name        string `json:"name"`
 	Description string `json:"description"`
+	Number      string `json:"number"`
 }
 
 // decodeUpdateProgramVersionRequest decodes a request to update a version.
@@ -56,5 +57,13 @@ func decodeUpdateProgramVersionRequest(_ context.Context, req *http.Request) (in
 		}
 		description = optional.Of[version.Description](descriptionValue)
 	}
-	return updateprogramversion.NewCommand(id, name, description), nil
+	number := optional.Empty[version.Number]()
+	if dto.Number != "" {
+		numberValue, err := version.NewNumber(dto.Number)
+		if err != nil {
+			return nil, err
+		}
+		number = optional.Of[version.Number](numberValue)
+	}
+	return updateprogramversion.NewCommand(id, name, description, number), nil
 }

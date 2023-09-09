@@ -20,6 +20,7 @@ type VersionModel struct {
 	Program     ProgramModel `gorm:"foreignKey:ProgramID;references:ID"`
 	Status      string       // TODO change to enum
 	Description string       // TODO set limit for length
+	Number      string       // TODO set limit for length
 }
 
 // TableName returns a table name.
@@ -43,12 +44,17 @@ func (r *VersionRepository) Save(ctx context.Context, version version.Version) {
 	if version.Description().IsPresent() {
 		descriptionValue = version.Description().Value().String()
 	}
+	numberValue := ""
+	if version.Number().IsPresent() {
+		numberValue = version.Number().Value().String()
+	}
 	err := r.db.WithContext(ctx).Save(&VersionModel{
 		ID:          version.ID().String(),
 		Name:        version.Name().String(),
 		ProgramID:   version.ProgramID().String(),
 		Status:      version.Status().String(),
 		Description: descriptionValue,
+		Number:      numberValue,
 	}).Error
 	if err != nil {
 		panic(err)
@@ -72,6 +78,10 @@ func (r *VersionRepository) FindByID(ctx context.Context, id version.ID) *versio
 	if model.Description != "" {
 		description = optional.Of[version.Description](version.MustNewDescription(model.Description))
 	}
+	number := optional.Empty[version.Number]()
+	if model.Number != "" {
+		number = optional.Of[version.Number](version.MustNewNumber(model.Number))
+	}
 
 	_v := version.NewExistingVersion(
 		version.MustNewID(model.ID),
@@ -79,6 +89,7 @@ func (r *VersionRepository) FindByID(ctx context.Context, id version.ID) *versio
 		program.MustNewID(model.ProgramID),
 		version.MustNewStatus(model.Status),
 		description,
+		number,
 	)
 	return &_v
 }

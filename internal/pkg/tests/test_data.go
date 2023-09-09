@@ -32,6 +32,7 @@ func NewOnReviewVersion() (version.Version, program.Program) {
 		_program.ID(),
 		version.OnReviewStatus,
 		optional.Empty[version.Description](),
+		optional.Empty[version.Number](),
 	)
 	return _version, _program
 }

@@ -16,5 +16,6 @@ Content-Type: application/json
 
 {
   "name": "new name",
-  "description": "new description"
+  "description": "new description",
+  "number": "1.0.1",
 }

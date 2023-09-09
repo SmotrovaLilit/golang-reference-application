@@ -19,12 +19,13 @@ func TestUpdateProgramVersionHandler(t *testing.T) {
 
 	newVersionName := version.MustNewName("new-name")
 	newVersionDescription := optional.Of[version.Description](version.MustNewDescription("new-description"))
+	newVersionNumber := optional.Of[version.Number](version.MustNewNumber("1.0.1"))
 
 	// Test operation
 	req, err := http.NewRequest(
 		"PUT",
 		test.Addr+"/versions/"+existingVersion.ID().String(),
-		strings.NewReader(`{"name":"new-name", "description": "new-description"}`),
+		strings.NewReader(`{"name":"new-name", "description": "new-description", "number": "1.0.1"}`),
 	)
 	require.NoError(t, err)
 	req.Header.Set("Content-Type", "application/json")
@@ -42,4 +43,5 @@ func TestUpdateProgramVersionHandler(t *testing.T) {
 	require.NotNil(t, _version)
 	require.Equal(t, newVersionName.String(), _version.Name().String())
 	require.Equal(t, newVersionDescription.Value().String(), _version.Description().Value().String())
+	require.Equal(t, newVersionNumber.Value().String(), _version.Number().Value().String())
 }

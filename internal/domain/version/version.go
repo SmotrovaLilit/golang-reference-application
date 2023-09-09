@@ -12,6 +12,7 @@ type Version struct {
 	programID   program.ID
 	status      Status
 	description Optional[Description]
+	number      Optional[Number]
 }
 
 // NewVersion is a constructor for Version.
@@ -22,6 +23,7 @@ func NewVersion(id ID, name Name, programID program.ID) Version {
 		programID:   programID,
 		status:      DraftStatus,
 		description: Empty[Description](),
+		number:      Empty[Number](),
 	}
 }
 
@@ -32,6 +34,7 @@ func NewExistingVersion(
 	programID program.ID,
 	status Status,
 	description Optional[Description],
+	number Optional[Number],
 ) Version {
 	return Version{
 		id:          id,
@@ -39,6 +42,7 @@ func NewExistingVersion(
 		programID:   programID,
 		status:      status,
 		description: description,
+		number:      number,
 	}
 }
 
@@ -67,13 +71,23 @@ func (v *Version) Description() Optional[Description] {
 	return v.description
 }
 
+// Number returns a version number.
+func (v *Version) Number() Optional[Number] {
+	return v.number
+}
+
 // Update updates a version.
-func (v *Version) Update(name Name, description Optional[Description]) error {
+func (v *Version) Update(
+	name Name,
+	description Optional[Description],
+	number Optional[Number],
+) error {
 	if err := v.canUpdate(); err != nil {
 		return err
 	}
 	v.name = name
 	v.description = description
+	v.number = number
 	return nil
 }
 

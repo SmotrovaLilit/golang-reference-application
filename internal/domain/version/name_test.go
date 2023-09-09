@@ -17,7 +17,7 @@ func TestNewName(t *testing.T) {
 		{
 			name:          "success to create name",
 			input:         "smart-calculator",
-			want:          "smart-calculator",
+			want:          MustNewName("smart-calculator"),
 			wantErr:       nil,
 			wantErrString: "",
 		},

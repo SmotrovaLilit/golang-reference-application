@@ -23,6 +23,7 @@ type Command struct {
 	ID          version.ID
 	name        version.Name
 	description optional.Optional[version.Description]
+	number      optional.Optional[version.Number]
 }
 
 // Handler is a handler to update a version.
@@ -35,11 +36,13 @@ func NewCommand(
 	id version.ID,
 	name version.Name,
 	description optional.Optional[version.Description],
+	number optional.Optional[version.Number],
 ) Command {
 	return Command{
 		ID:          id,
 		name:        name,
 		description: description,
+		number:      number,
 	}
 }
 
@@ -49,7 +52,7 @@ func (h Handler) Handle(ctx context.Context, cmd Command) error {
 	if _version == nil {
 		return ErrVersionNotFound
 	}
-	err := _version.Update(cmd.name, cmd.description)
+	err := _version.Update(cmd.name, cmd.description, cmd.number)
 	if err != nil {
 		return err
 	}
