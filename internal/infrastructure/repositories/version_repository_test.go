@@ -8,6 +8,7 @@ import (
 	"gorm.io/gorm"
 	"reference-application/internal/domain/version"
 	"reference-application/internal/infrastructure/repositories"
+	"reference-application/internal/pkg/optional"
 	"reference-application/internal/pkg/tests"
 	"testing"
 )
@@ -21,13 +22,13 @@ func TestVersionRepository_Save(t *testing.T) {
 
 	test.ExpectBegin()
 	test.ExpectExec(`UPDATE "versions"`).
-		WithArgs(testVersionName.String(), testProgramID.String(), version.DraftStatus, testVersionID.String()).
+		WithArgs(testVersionName.String(), testProgramID.String(), version.DraftStatus, "", testVersionID.String()).
 		WillReturnResult(sqlmock.NewResult(0, 0))
 	test.ExpectCommit()
 
 	test.ExpectBegin()
 	test.ExpectExec(`INSERT INTO "versions"`).
-		WithArgs(testVersionID.String(), testVersionName.String(), testProgramID.String(), version.DraftStatus).
+		WithArgs(testVersionID.String(), testVersionName.String(), testProgramID.String(), version.DraftStatus, "").
 		WillReturnResult(sqlmock.NewResult(0, 1))
 	test.ExpectCommit()
 
@@ -40,13 +41,41 @@ func TestVersionRepository_Save(t *testing.T) {
 	require.NoError(t, test.ExpectationsWereMet())
 }
 
+func TestVersionRepository_SaveWithAllFields(t *testing.T) {
+	test := tests.PrepareTestWithMockedDatabase(t)
+	versionRepository := repositories.NewVersionRepository(test.DB)
+
+	test.ExpectBegin()
+	test.ExpectExec(`UPDATE "versions"`).
+		// TODO тестовые данные надо брать из одного места чтобы потом сразу поправить если правила валидации поменяются
+		WithArgs(testVersionName.String(), testProgramID.String(), version.DraftStatus, "so long description", testVersionID.String()).
+		WillReturnResult(sqlmock.NewResult(0, 0))
+	test.ExpectCommit()
+
+	test.ExpectBegin()
+	test.ExpectExec(`INSERT INTO "versions"`).
+		WithArgs(testVersionID.String(), testVersionName.String(), testProgramID.String(), version.DraftStatus, "so long description").
+		WillReturnResult(sqlmock.NewResult(0, 1))
+	test.ExpectCommit()
+
+	_version := version.NewExistingVersion(
+		testVersionID,
+		testVersionName,
+		testProgramID,
+		version.DraftStatus,
+		optional.Of[version.Description](version.MustNewDescription("so long description")),
+	)
+	versionRepository.Save(context.Background(), _version)
+	require.NoError(t, test.ExpectationsWereMet())
+}
+
 func TestVersionRepository_Save_Error(t *testing.T) {
 	test := tests.PrepareTestWithMockedDatabase(t)
 	versionRepository := repositories.NewVersionRepository(test.DB)
 
 	test.ExpectBegin()
 	test.ExpectExec(`UPDATE "versions"`).
-		WithArgs(testVersionName.String(), testProgramID.String(), version.DraftStatus, testVersionID.String()).
+		WithArgs(testVersionName.String(), testProgramID.String(), version.DraftStatus, "", testVersionID.String()).
 		WillReturnError(errors.New("error"))
 	test.ExpectRollback()
 
@@ -69,14 +98,35 @@ func TestVersionRepository_FindByID(t *testing.T) {
 
 	test.ExpectQuery(`SELECT \* FROM "versions"`).
 		WithArgs(testVersionID.String()).
-		WillReturnRows(sqlmock.NewRows([]string{"id", "name", "program_id", "status"}).
-			AddRow(testVersionID.String(), testVersionName.String(), testProgramID.String(), "DRAFT"))
+		WillReturnRows(sqlmock.NewRows([]string{"id", "name", "program_id", "status", "description"}).
+			AddRow(testVersionID.String(), testVersionName.String(), testProgramID.String(), "DRAFT", ""))
 
 	_version := versionRepository.FindByID(context.Background(), testVersionID)
 	require.Equal(t, testVersionID, _version.ID())
 	require.Equal(t, testVersionName, _version.Name())
 	require.Equal(t, testProgramID, _version.ProgramID())
 	require.Equal(t, version.DraftStatus, _version.Status())
+	require.True(t, _version.Description().IsEmpty())
+
+	require.NoError(t, test.ExpectationsWereMet())
+}
+
+func TestVersionRepository_FindByIDWithAllFields(t *testing.T) {
+	test := tests.PrepareTestWithMockedDatabase(t)
+	versionRepository := repositories.NewVersionRepository(test.DB)
+
+	test.ExpectQuery(`SELECT \* FROM "versions"`).
+		WithArgs(testVersionID.String()).
+		WillReturnRows(sqlmock.NewRows([]string{"id", "name", "program_id", "status", "description"}).
+			AddRow(testVersionID.String(), testVersionName.String(), testProgramID.String(), "DRAFT", "so long description"))
+
+	_version := versionRepository.FindByID(context.Background(), testVersionID)
+	require.Equal(t, testVersionID, _version.ID())
+	require.Equal(t, testVersionName, _version.Name())
+	require.Equal(t, testProgramID, _version.ProgramID())
+	require.Equal(t, version.DraftStatus, _version.Status())
+	require.True(t, _version.Description().IsPresent())
+	require.Equal(t, "so long description", _version.Description().Value().String())
 
 	require.NoError(t, test.ExpectationsWereMet())
 }

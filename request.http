@@ -15,5 +15,6 @@ PUT http://localhost:8080/versions/11a111cf-91f3-49dc-bb6d-ac4235635411
 Content-Type: application/json
 
 {
-    "name": "new name"
+  "name": "new name",
+  "description": "new description"
 }

@@ -30,14 +30,14 @@ func MustNewStatus(s string) Status {
 	panic("unknown status")
 }
 
-// isDraft checks if a version status is draft.
-func (s Status) isDraft() bool {
+// IsDraft checks if a version status is draft.
+func (s Status) IsDraft() bool {
 	return s == DraftStatus
 }
 
 // canUpdate checks if a version status allows to update version.
 func (s Status) canUpdate() error {
-	if s.isDraft() {
+	if s.IsDraft() {
 		return nil
 	}
 	return ErrUpdateVersionStatus

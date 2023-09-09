@@ -22,6 +22,15 @@ func TestDecodeUpdateProgramVersionRequest(t *testing.T) {
 			request: mux.SetURLVars(httptest.NewRequest(
 				http.MethodPut,
 				"/versions/11a111cf-91f3-49dc-bb6d-ac4235635411",
+				strings.NewReader(`{"name":"new-name", "description": "new-description"}`),
+			), map[string]string{"id": "11a111cf-91f3-49dc-bb6d-ac4235635411"}),
+			wantErr: nil,
+		},
+		{
+			name: "valid request with only required fields",
+			request: mux.SetURLVars(httptest.NewRequest(
+				http.MethodPut,
+				"/versions/11a111cf-91f3-49dc-bb6d-ac4235635411",
 				strings.NewReader(`{"name":"new-name"}`),
 			), map[string]string{"id": "11a111cf-91f3-49dc-bb6d-ac4235635411"}),
 			wantErr: nil,
@@ -52,6 +61,15 @@ func TestDecodeUpdateProgramVersionRequest(t *testing.T) {
 				strings.NewReader(`{"name":"sh"}`),
 			), map[string]string{"id": "11a111cf-91f3-49dc-bb6d-ac4235635411"}),
 			wantErr: version.ErrNameLength,
+		},
+		{
+			name: "invalid version description",
+			request: mux.SetURLVars(httptest.NewRequest(
+				http.MethodPut,
+				"/versions/11a111cf-91f3-49dc-bb6d-ac4235635411",
+				strings.NewReader(`{"name":"new-name", "description": "sh"}`),
+			), map[string]string{"id": "11a111cf-91f3-49dc-bb6d-ac4235635411"}),
+			wantErr: version.ErrDescriptionLength,
 		},
 	}
 	for _, tt := range tests {

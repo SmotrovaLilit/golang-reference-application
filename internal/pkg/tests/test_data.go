@@ -3,6 +3,7 @@ package tests
 import (
 	"reference-application/internal/domain/program"
 	"reference-application/internal/domain/version"
+	"reference-application/internal/pkg/optional"
 )
 
 // NewDraftVersion returns a new draft version.
@@ -30,6 +31,7 @@ func NewOnReviewVersion() (version.Version, program.Program) {
 		"ios-smart-calculator",
 		_program.ID(),
 		version.OnReviewStatus,
+		optional.Empty[version.Description](),
 	)
 	return _version, _program
 }

@@ -1,22 +1,27 @@
 package version
 
-import "reference-application/internal/domain/program"
+import (
+	"reference-application/internal/domain/program"
+	. "reference-application/internal/pkg/optional"
+)
 
 // Version is a type for a program version.
 type Version struct {
-	id        ID
-	name      Name
-	programID program.ID
-	status    Status
+	id          ID
+	name        Name
+	programID   program.ID
+	status      Status
+	description Optional[Description]
 }
 
 // NewVersion is a constructor for Version.
 func NewVersion(id ID, name Name, programID program.ID) Version {
 	return Version{
-		id:        id,
-		name:      name,
-		programID: programID,
-		status:    DraftStatus,
+		id:          id,
+		name:        name,
+		programID:   programID,
+		status:      DraftStatus,
+		description: Empty[Description](),
 	}
 }
 
@@ -25,12 +30,15 @@ func NewExistingVersion(
 	id ID,
 	name Name,
 	programID program.ID,
-	status Status) Version {
+	status Status,
+	description Optional[Description],
+) Version {
 	return Version{
-		id:        id,
-		name:      name,
-		programID: programID,
-		status:    status,
+		id:          id,
+		name:        name,
+		programID:   programID,
+		status:      status,
+		description: description,
 	}
 }
 
@@ -54,12 +62,18 @@ func (v *Version) Status() Status {
 	return v.status
 }
 
-// UpdateName updates a version name.
-func (v *Version) UpdateName(value Name) error {
+// Description returns a version description.
+func (v *Version) Description() Optional[Description] {
+	return v.description
+}
+
+// Update updates a version.
+func (v *Version) Update(name Name, description Optional[Description]) error {
 	if err := v.canUpdate(); err != nil {
 		return err
 	}
-	v.name = value
+	v.name = name
+	v.description = description
 	return nil
 }
 

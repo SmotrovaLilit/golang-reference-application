@@ -10,6 +10,7 @@ import (
 	"reference-application/internal/application/commands/updateprogramversion"
 	"reference-application/internal/domain/version"
 	xhttp "reference-application/internal/pkg/http"
+	"reference-application/internal/pkg/optional"
 )
 
 // newUpdateProgramVersionHandler creates a new http.Handler to update a version.
@@ -24,7 +25,8 @@ func newUpdateProgramVersionHandler(e updateprogramversion.Endpoint) http.Handle
 
 // updateProgramVersionRequestDTO is a DTO for a request to update a version.
 type updateProgramVersionRequestDTO struct {
-	Name string `json:"name"`
+	Name        string `json:"name"`
+	Description string `json:"description"`
 }
 
 // decodeUpdateProgramVersionRequest decodes a request to update a version.
@@ -46,5 +48,13 @@ func decodeUpdateProgramVersionRequest(_ context.Context, req *http.Request) (in
 		return nil, err
 	}
 
-	return updateprogramversion.NewCommand(id, name), nil
+	description := optional.Empty[version.Description]()
+	if dto.Description != "" {
+		descriptionValue, err := version.NewDescription(dto.Description)
+		if err != nil {
+			return nil, err
+		}
+		description = optional.Of[version.Description](descriptionValue)
+	}
+	return updateprogramversion.NewCommand(id, name, description), nil
 }

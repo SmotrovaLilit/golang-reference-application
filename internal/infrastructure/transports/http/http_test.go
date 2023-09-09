@@ -58,6 +58,11 @@ func Test_convertErrorToApiError(t *testing.T) {
 			input: version.ErrNameLength,
 			want:  `{"error":"invalid version name length","code":"INVALID_VERSION_NAME_LENGTH"}`,
 		},
+		{
+			name:  "err version description length",
+			input: version.ErrDescriptionLength,
+			want:  `{"error":"invalid version description length","code":"INVALID_VERSION_DESCRIPTION_LENGTH"}`,
+		},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
