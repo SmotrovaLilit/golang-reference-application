@@ -6,6 +6,7 @@ import (
 	"github.com/stretchr/testify/require"
 	"net/http"
 	"net/http/httptest"
+	"reference-application/internal/application/commands/sendtoreviewprogramversion"
 	"reference-application/internal/domain/version"
 	"testing"
 )
@@ -15,6 +16,7 @@ func Test_decodeSendToReviewProgramVersionRequest(t *testing.T) {
 		name    string
 		request *http.Request
 		wantErr error
+		want    interface{}
 	}{
 		{
 			name: "valid request",
@@ -24,6 +26,9 @@ func Test_decodeSendToReviewProgramVersionRequest(t *testing.T) {
 				nil,
 			), map[string]string{"id": "11a111cf-91f3-49dc-bb6d-ac4235635411"}),
 			wantErr: nil,
+			want: sendtoreviewprogramversion.NewCommand(
+				version.MustNewID("11a111cf-91f3-49dc-bb6d-ac4235635411"),
+			),
 		},
 		{
 			name: "invalid version id",
@@ -38,9 +43,13 @@ func Test_decodeSendToReviewProgramVersionRequest(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			t.Run(tt.name, func(t *testing.T) {
-				_, err := decodeSendToReviewProgramVersionRequest(context.TODO(), tt.request)
-				require.ErrorIs(t, err, tt.wantErr)
-				// TODO check that the command is created correctly https://github.com/SmotrovaLilit/golang-reference-application/issues/16
+				got, err := decodeSendToReviewProgramVersionRequest(context.TODO(), tt.request)
+				if tt.wantErr == nil {
+					require.NoError(t, err)
+					require.Equal(t, tt.want, got)
+				} else {
+					require.ErrorIs(t, err, tt.wantErr)
+				}
 			})
 		})
 	}

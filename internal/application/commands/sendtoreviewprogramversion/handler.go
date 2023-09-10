@@ -16,7 +16,7 @@ var Set = wire.NewSet(
 
 // Command is a command to update a version.
 type Command struct {
-	ID version.ID
+	id version.ID
 }
 
 // Handler is a handler to update a version.
@@ -29,13 +29,13 @@ func NewCommand(
 	id version.ID,
 ) Command {
 	return Command{
-		ID: id,
+		id: id,
 	}
 }
 
 // Handle handles a command to update a version.
 func (h Handler) Handle(ctx context.Context, cmd Command) error {
-	_version := h.Repository.FindByID(ctx, cmd.ID)
+	_version := h.Repository.FindByID(ctx, cmd.id)
 	if _version == nil {
 		return sharederrors.ErrVersionNotFound
 	}

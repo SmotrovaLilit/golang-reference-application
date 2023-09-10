@@ -17,7 +17,7 @@ type VersionModel struct {
 	ID          string       `gorm:"primaryKey"` // TODO change to uuid, fix in https://github.com/SmotrovaLilit/golang-reference-application/issues/11
 	Name        string       // TODO set limit for length
 	ProgramID   string       // TODO change to uuid, fix in https://github.com/SmotrovaLilit/golang-reference-application/issues/11
-	Program     ProgramModel `gorm:"foreignKey:ProgramID;references:ID"`
+	Program     ProgramModel `gorm:"foreignKey:ProgramID;references:id"`
 	Status      string       // TODO change to enum
 	Description string       // TODO set limit for length
 	Number      string       // TODO set limit for length

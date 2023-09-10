@@ -7,7 +7,9 @@ import (
 	"github.com/stretchr/testify/require"
 	"net/http"
 	"net/http/httptest"
+	"reference-application/internal/application/commands/updateprogramversion"
 	"reference-application/internal/domain/version"
+	"reference-application/internal/pkg/optional"
 	"strings"
 	"testing"
 )
@@ -17,6 +19,7 @@ func TestDecodeUpdateProgramVersionRequest(t *testing.T) {
 		name    string
 		request *http.Request
 		wantErr error
+		want    interface{}
 	}{
 		{
 			name: "valid request",
@@ -26,6 +29,12 @@ func TestDecodeUpdateProgramVersionRequest(t *testing.T) {
 				strings.NewReader(`{"name":"new-name", "description": "new-description", "number": "1.0.1"}`),
 			), map[string]string{"id": "11a111cf-91f3-49dc-bb6d-ac4235635411"}),
 			wantErr: nil,
+			want: updateprogramversion.NewCommand(
+				version.MustNewID("11a111cf-91f3-49dc-bb6d-ac4235635411"),
+				version.MustNewName("new-name"),
+				optional.Of[version.Description](version.MustNewDescription("new-description")),
+				optional.Of[version.Number](version.MustNewNumber("1.0.1")),
+			),
 		},
 		{
 			name: "valid request with only required fields",
@@ -35,6 +44,12 @@ func TestDecodeUpdateProgramVersionRequest(t *testing.T) {
 				strings.NewReader(`{"name":"new-name"}`),
 			), map[string]string{"id": "11a111cf-91f3-49dc-bb6d-ac4235635411"}),
 			wantErr: nil,
+			want: updateprogramversion.NewCommand(
+				version.MustNewID("11a111cf-91f3-49dc-bb6d-ac4235635411"),
+				version.MustNewName("new-name"),
+				optional.Empty[version.Description](),
+				optional.Empty[version.Number](),
+			),
 		},
 		{
 			name: "not valid json",
@@ -84,9 +99,13 @@ func TestDecodeUpdateProgramVersionRequest(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			_, err := decodeUpdateProgramVersionRequest(context.TODO(), tt.request)
-			require.ErrorIs(t, err, tt.wantErr)
-			// TODO check that the command is created correctly https://github.com/SmotrovaLilit/golang-reference-application/issues/16
+			got, err := decodeUpdateProgramVersionRequest(context.TODO(), tt.request)
+			if tt.wantErr == nil {
+				require.NoError(t, err)
+				require.Equal(t, tt.want, got)
+			} else {
+				require.ErrorIs(t, err, tt.wantErr)
+			}
 		})
 	}
 }
