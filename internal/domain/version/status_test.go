@@ -79,3 +79,96 @@ func TestStatus_IsOnReview(t *testing.T) {
 		})
 	}
 }
+
+func TestStatus_IsApproved(t *testing.T) {
+	tests := []struct {
+		name string
+		s    Status
+		want bool
+	}{
+		{
+			name: "success",
+			s:    ApprovedStatus,
+			want: true,
+		},
+		{
+			name: "failed",
+			s:    DraftStatus,
+			want: false,
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			got := tt.s.IsApproved()
+			require.Equal(t, tt.want, got)
+		})
+	}
+}
+
+func TestStatus_approve(t *testing.T) {
+	tests := []struct {
+		name    string
+		s       Status
+		want    Status
+		wantErr error
+	}{
+		{
+			name: "success",
+			s:    OnReviewStatus,
+			want: ApprovedStatus,
+		},
+		{
+			name:    "from_draft",
+			s:       DraftStatus,
+			wantErr: ErrInvalidStatusToApprove,
+		},
+		{
+			name:    "from_approved",
+			s:       ApprovedStatus,
+			wantErr: ErrInvalidStatusToApprove,
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			got, err := tt.s.approve()
+			require.ErrorIs(t, err, tt.wantErr)
+			require.Equal(t, tt.want, got)
+		})
+	}
+}
+
+func TestMustNewStatus(t *testing.T) {
+	tests := []struct {
+		name string
+		raw  string
+		want Status
+	}{
+		{
+			name: "draft status",
+			raw:  "DRAFT",
+			want: DraftStatus,
+		},
+		{
+			name: "on review status",
+			raw:  "ON_REVIEW",
+			want: OnReviewStatus,
+		},
+		{
+			name: "approved status",
+			raw:  "APPROVED",
+			want: ApprovedStatus,
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			got := MustNewStatus(tt.raw)
+			require.Equal(t, tt.want, got)
+		})
+	}
+}
+
+func TestStatus_Panic(t *testing.T) {
+	require.Panics(t, func() {
+		_ = MustNewStatus("INVALID")
+	})
+}

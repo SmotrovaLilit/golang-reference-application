@@ -225,3 +225,55 @@ func TestVersion_SendToReview(t *testing.T) {
 		})
 	}
 }
+
+func TestVersion_Approve(t *testing.T) {
+	type fields struct {
+		id        ID
+		name      Name
+		programID program.ID
+		status    Status
+	}
+	tests := []struct {
+		name    string
+		fields  fields
+		wantErr error
+	}{
+		{
+			name: "success",
+			fields: fields{
+				id:        MustNewID("11a111cf-91f3-49dc-bb6d-ac4235635411"),
+				name:      MustNewName("name"),
+				programID: program.MustNewID("ecaffa6e-4302-4a46-ae72-44a7bd20dfd5"),
+				status:    OnReviewStatus,
+			},
+		},
+		{
+			name: "status_failed",
+			fields: fields{
+				id:        MustNewID("11a111cf-91f3-49dc-bb6d-ac4235635411"),
+				name:      MustNewName("name"),
+				programID: program.MustNewID("ecaffa6e-4302-4a46-ae72-44a7bd20dfd5"),
+				status:    DraftStatus,
+			},
+			wantErr: ErrInvalidStatusToApprove,
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			v := &Version{
+				id:        tt.fields.id,
+				name:      tt.fields.name,
+				programID: tt.fields.programID,
+				status:    tt.fields.status,
+			}
+			err := v.Approve()
+			if tt.wantErr == nil {
+				require.NoError(t, err)
+				require.True(t, v.status.IsApproved())
+			} else {
+				require.ErrorIs(t, err, tt.wantErr)
+				require.Equal(t, tt.fields.status, v.status)
+			}
+		})
+	}
+}

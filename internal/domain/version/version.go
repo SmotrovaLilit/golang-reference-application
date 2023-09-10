@@ -109,6 +109,16 @@ func (v *Version) SendToReview() error {
 	return nil
 }
 
+// Approve approves a version.
+func (v *Version) Approve() error {
+	newStatus, err := v.status.approve()
+	if err != nil {
+		return err
+	}
+	v.status = newStatus
+	return nil
+}
+
 // canUpdate checks if a version can be updated.
 func (v *Version) canUpdate() error {
 	return v.status.canUpdate()
