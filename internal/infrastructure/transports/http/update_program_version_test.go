@@ -14,6 +14,7 @@ import (
 	"testing"
 )
 
+//nolint:funlen
 func TestDecodeUpdateProgramVersionRequest(t *testing.T) {
 	tests := []struct {
 		name    string

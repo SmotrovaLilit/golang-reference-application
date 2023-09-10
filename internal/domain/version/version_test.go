@@ -46,6 +46,7 @@ func TestNewExistingVersion(t *testing.T) {
 	require.Equal(t, number, got.Number().Value())
 }
 
+//nolint:funlen
 func TestVersion_Update(t *testing.T) {
 	type fields struct {
 		id          ID
@@ -128,6 +129,7 @@ func TestVersion_Update(t *testing.T) {
 	}
 }
 
+//nolint:funlen
 func TestVersion_SendToReview(t *testing.T) {
 	type fields struct {
 		id          ID
