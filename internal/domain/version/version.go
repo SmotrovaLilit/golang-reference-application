@@ -119,6 +119,16 @@ func (v *Version) Approve() error {
 	return nil
 }
 
+// Decline declines a version.
+func (v *Version) Decline() error {
+	newStatus, err := v.status.decline()
+	if err != nil {
+		return err
+	}
+	v.status = newStatus
+	return nil
+}
+
 // canUpdate checks if a version can be updated.
 func (v *Version) canUpdate() error {
 	return v.status.canUpdate()

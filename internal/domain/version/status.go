@@ -6,6 +6,7 @@ var (
 	ErrUpdateVersionStatus         = errorswithcode.NewValidationErrorWithCode("invalid status to update version", "INVALID_STATUS_TO_UPDATE")
 	ErrInvalidStatusToSendToReview = errorswithcode.NewValidationErrorWithCode("invalid status to send to review", "INVALID_STATUS_TO_SEND_TO_REVIEW")
 	ErrInvalidStatusToApprove      = errorswithcode.NewValidationErrorWithCode("invalid status to approve", "INVALID_STATUS_TO_APPROVE")
+	ErrInvalidStatusToDecline      = errorswithcode.NewValidationErrorWithCode("invalid status to decline", "INVALID_STATUS_TO_DECLINE")
 )
 
 // Status is a type for a version status.
@@ -15,6 +16,7 @@ const (
 	DraftStatus    Status = "DRAFT"
 	OnReviewStatus Status = "ON_REVIEW"
 	ApprovedStatus Status = "APPROVED"
+	DeclinedStatus Status = "DECLINED"
 )
 
 // String returns a string representation of a status.
@@ -31,6 +33,8 @@ func MustNewStatus(s string) Status {
 		return OnReviewStatus
 	case ApprovedStatus.String():
 		return ApprovedStatus
+	case DeclinedStatus.String():
+		return DeclinedStatus
 	}
 	panic("unknown status")
 }
@@ -50,7 +54,13 @@ func (s Status) IsApproved() bool {
 	return s == ApprovedStatus
 }
 
+// IsDeclined checks if a version status is declined.
+func (s Status) IsDeclined() bool {
+	return s == DeclinedStatus
+}
+
 // sendToReview checks if a version status allows to send version to review.
+// It returns OnReviewStatus.
 func (s Status) sendToReview() (Status, error) {
 	if s.IsDraft() {
 		return OnReviewStatus, nil
@@ -65,6 +75,15 @@ func (s Status) approve() (Status, error) {
 		return ApprovedStatus, nil
 	}
 	return "", ErrInvalidStatusToApprove
+}
+
+// decline checks if a version status allows to decline version and returns DeclinedStatus.
+// It returns DeclinedStatus.
+func (s Status) decline() (Status, error) {
+	if s.IsOnReview() {
+		return DeclinedStatus, nil
+	}
+	return "", ErrInvalidStatusToDecline
 }
 
 // canUpdate checks if a version status allows to update version.

@@ -88,6 +88,11 @@ func Test_convertErrorToApiError(t *testing.T) {
 			input: version.ErrInvalidStatusToApprove,
 			want:  `{"error":"invalid status to approve","code":"INVALID_STATUS_TO_APPROVE"}`,
 		},
+		{
+			name:  "err invalid status to decline",
+			input: version.ErrInvalidStatusToDecline,
+			want:  `{"error":"invalid status to decline","code":"INVALID_STATUS_TO_DECLINE"}`,
+		},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
