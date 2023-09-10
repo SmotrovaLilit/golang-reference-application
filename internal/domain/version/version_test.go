@@ -46,6 +46,7 @@ func TestNewExistingVersion(t *testing.T) {
 	require.Equal(t, number, got.Number().Value())
 }
 
+//nolint:funlen
 func TestVersion_Update(t *testing.T) {
 	type fields struct {
 		id          ID
@@ -123,6 +124,155 @@ func TestVersion_Update(t *testing.T) {
 				require.Equal(t, tt.fields.description, v.description)
 				require.Equal(t, tt.fields.name, v.name)
 				require.Equal(t, tt.fields.number, v.number)
+			}
+		})
+	}
+}
+
+//nolint:funlen
+func TestVersion_SendToReview(t *testing.T) {
+	type fields struct {
+		id          ID
+		name        Name
+		programID   program.ID
+		status      Status
+		description optional.Optional[Description]
+		number      optional.Optional[Number]
+	}
+	tests := []struct {
+		name    string
+		fields  fields
+		wantErr error
+	}{
+		{
+			name: "success",
+			fields: fields{
+				id:          MustNewID("11a111cf-91f3-49dc-bb6d-ac4235635411"),
+				name:        MustNewName("name"),
+				number:      optional.Of[Number](MustNewNumber("1.0.0")),
+				programID:   program.MustNewID("ecaffa6e-4302-4a46-ae72-44a7bd20dfd5"),
+				status:      DraftStatus,
+				description: optional.Of[Description](MustNewDescription("description")),
+			},
+		},
+		{
+			name: "status_failed",
+			fields: fields{
+				id:          MustNewID("11a111cf-91f3-49dc-bb6d-ac4235635411"),
+				name:        MustNewName("name"),
+				number:      optional.Of[Number](MustNewNumber("1.0.0")),
+				programID:   program.MustNewID("ecaffa6e-4302-4a46-ae72-44a7bd20dfd5"),
+				status:      OnReviewStatus,
+				description: optional.Of[Description](MustNewDescription("description")),
+			},
+			wantErr: ErrInvalidStatusToSendToReview,
+		},
+		{
+			name: "description_is_empty",
+			fields: fields{
+				id:          MustNewID("11a111cf-91f3-49dc-bb6d-ac4235635411"),
+				name:        MustNewName("name"),
+				number:      optional.Of[Number](MustNewNumber("1.0.0")),
+				programID:   program.MustNewID("ecaffa6e-4302-4a46-ae72-44a7bd20dfd5"),
+				status:      DraftStatus,
+				description: optional.Empty[Description](),
+			},
+			wantErr: ErrEmptyDescription,
+		},
+		{
+			name: "number_is_empty",
+			fields: fields{
+				id:          MustNewID("11a111cf-91f3-49dc-bb6d-ac4235635411"),
+				name:        MustNewName("name"),
+				number:      optional.Empty[Number](),
+				programID:   program.MustNewID("ecaffa6e-4302-4a46-ae72-44a7bd20dfd5"),
+				status:      DraftStatus,
+				description: optional.Of[Description](MustNewDescription("description")),
+			},
+			wantErr: ErrEmptyNumber,
+		},
+		{
+			name: "description_validation_for_review_failed",
+			fields: fields{
+				id:          MustNewID("11a111cf-91f3-49dc-bb6d-ac4235635411"),
+				name:        MustNewName("name"),
+				number:      optional.Of[Number](MustNewNumber("1.0.0")),
+				programID:   program.MustNewID("ecaffa6e-4302-4a46-ae72-44a7bd20dfd5"),
+				status:      DraftStatus,
+				description: optional.Of[Description](MustNewDescription("sh")),
+			},
+			wantErr: ErrDescriptionLength,
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			v := &Version{
+				id:          tt.fields.id,
+				name:        tt.fields.name,
+				programID:   tt.fields.programID,
+				status:      tt.fields.status,
+				description: tt.fields.description,
+				number:      tt.fields.number,
+			}
+			err := v.SendToReview()
+			if tt.wantErr == nil {
+				require.NoError(t, err)
+				require.Equal(t, OnReviewStatus, v.status)
+			} else {
+				require.ErrorIs(t, err, tt.wantErr)
+				require.Equal(t, tt.fields.status, v.status)
+			}
+		})
+	}
+}
+
+func TestVersion_Approve(t *testing.T) {
+	type fields struct {
+		id        ID
+		name      Name
+		programID program.ID
+		status    Status
+	}
+	tests := []struct {
+		name    string
+		fields  fields
+		wantErr error
+	}{
+		{
+			name: "success",
+			fields: fields{
+				id:        MustNewID("11a111cf-91f3-49dc-bb6d-ac4235635411"),
+				name:      MustNewName("name"),
+				programID: program.MustNewID("ecaffa6e-4302-4a46-ae72-44a7bd20dfd5"),
+				status:    OnReviewStatus,
+			},
+		},
+		{
+			name: "status_failed",
+			fields: fields{
+				id:        MustNewID("11a111cf-91f3-49dc-bb6d-ac4235635411"),
+				name:      MustNewName("name"),
+				programID: program.MustNewID("ecaffa6e-4302-4a46-ae72-44a7bd20dfd5"),
+				status:    DraftStatus,
+			},
+			wantErr: ErrInvalidStatusToApprove,
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			v := &Version{
+				id:        tt.fields.id,
+				name:      tt.fields.name,
+				programID: tt.fields.programID,
+				status:    tt.fields.status,
+			}
+			err := v.Approve()
+			if tt.wantErr == nil {
+				require.NoError(t, err)
+				require.True(t, v.status.IsApproved())
+			} else {
+				require.ErrorIs(t, err, tt.wantErr)
+				require.Equal(t, tt.fields.status, v.status)
 			}
 		})
 	}

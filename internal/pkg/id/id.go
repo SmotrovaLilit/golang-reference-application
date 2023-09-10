@@ -11,7 +11,7 @@ type Base struct {
 
 func (b *Base) setUUID(_uuid uuid.UUID) { b.uuid = _uuid }
 
-// String returns a string representation of ID.
+// String returns a string representation of id.
 func (b Base) String() string { return b.uuid.String() }
 
 type idSetter[T any] interface {
@@ -48,7 +48,7 @@ func MustNewFactory[PT idSetter[T], T any](errInvalidID error) MustNewFunc[T] {
 	}
 }
 
-// ConstructorsFactory is a generic function for creating constructors for ID.
+// ConstructorsFactory is a generic function for creating constructors for id.
 // It returns New and MustNew functions.
 func ConstructorsFactory[PT idSetter[T], T any](errInvalidID error) (
 	NewFunc[T],

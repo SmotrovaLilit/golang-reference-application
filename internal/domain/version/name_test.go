@@ -16,28 +16,28 @@ func TestNewName(t *testing.T) {
 	}{
 		{
 			name:          "success to create name",
-			input:         "smart-calculator",
-			want:          MustNewName("smart-calculator"),
+			input:         "   " + strings.Repeat("a", nameMaxLength) + "   ",
+			want:          MustNewName(strings.Repeat("a", nameMaxLength)),
 			wantErr:       nil,
 			wantErrString: "",
 		},
 		{
 			name:          "empty name",
-			input:         "",
+			input:         "     ",
 			want:          "",
 			wantErr:       ErrNameLength,
 			wantErrString: "invalid version name length: name must be at least 3 characters long",
 		},
 		{
 			name:          "short name",
-			input:         "ab",
+			input:         "   " + strings.Repeat("a", nameMinLength-1) + "   ",
 			want:          "",
 			wantErr:       ErrNameLength,
 			wantErrString: "invalid version name length: name must be at least 3 characters long",
 		},
 		{
 			name:          "long name",
-			input:         strings.Repeat("a", 257),
+			input:         strings.Repeat("a", nameMaxLength+1),
 			want:          "",
 			wantErr:       ErrNameLength,
 			wantErrString: "invalid version name length: name must be at most 256 characters long",

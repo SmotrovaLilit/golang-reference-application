@@ -16,10 +16,10 @@ var Set = wire.NewSet(
 
 // Command is a command to create a program.
 type Command struct {
-	ID           program.ID // TODO make it private
-	PlatformCode program.PlatformCode
-	VersionID    version.ID
-	VersionName  version.Name
+	id           program.ID
+	platformCode program.PlatformCode
+	versionID    version.ID
+	versionName  version.Name
 }
 
 // NewCommand is a constructor for Command.
@@ -30,10 +30,10 @@ func NewCommand(
 	versionName version.Name,
 ) Command {
 	return Command{
-		ID:           id,
-		PlatformCode: platformCode,
-		VersionID:    versionID,
-		VersionName:  versionName,
+		id:           id,
+		platformCode: platformCode,
+		versionID:    versionID,
+		versionName:  versionName,
 	}
 }
 
@@ -44,8 +44,8 @@ type Handler struct {
 
 // Handle handles a command to create a program.
 func (h Handler) Handle(ctx context.Context, cmd Command) {
-	_program := program.NewProgram(cmd.ID, cmd.PlatformCode)
-	_version := version.NewVersion(cmd.VersionID, cmd.VersionName, _program.ID())
+	_program := program.NewProgram(cmd.id, cmd.platformCode)
+	_version := version.NewVersion(cmd.versionID, cmd.versionName, _program.ID())
 
 	h.UnitOfWork.Do(ctx, func(store repositories.UnitOfWorkStore) {
 		store.ProgramRepository().Save(ctx, _program)

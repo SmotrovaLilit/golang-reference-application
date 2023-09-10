@@ -5,6 +5,7 @@ import (
 	"github.com/stretchr/testify/require"
 	"net/http"
 	"net/http/httptest"
+	"reference-application/internal/application/commands/createprogram"
 	"reference-application/internal/domain/program"
 	"reference-application/internal/domain/version"
 	"strings"
@@ -17,6 +18,7 @@ func TestDecodeCreateProgramRequest(t *testing.T) {
 		name    string
 		request *http.Request
 		wantErr error
+		want    interface{}
 	}{
 		{
 			name: "valid request",
@@ -24,6 +26,12 @@ func TestDecodeCreateProgramRequest(t *testing.T) {
 				http.MethodPost,
 				"/programs",
 				strings.NewReader(`{"id":"3BA2DA12-CF71-49BD-A753-48BE34CD848D","platform_code":"ANDROID", "version":{"id":"11A111CF-91F3-49DC-BB6D-AC4235635411","name":"smart-calculator"}}`),
+			),
+			want: createprogram.NewCommand(
+				program.MustNewID("3BA2DA12-CF71-49BD-A753-48BE34CD848D"),
+				program.MustNewPlatformCode("ANDROID"),
+				version.MustNewID("11A111CF-91F3-49DC-BB6D-AC4235635411"),
+				version.MustNewName("smart-calculator"),
 			),
 		},
 		{
@@ -83,13 +91,13 @@ func TestDecodeCreateProgramRequest(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			_, err := decodeCreateProgramRequest(context.TODO(), tt.request)
+			got, err := decodeCreateProgramRequest(context.TODO(), tt.request)
 			if tt.wantErr == nil {
 				require.NoError(t, err)
+				require.Equal(t, tt.want, got)
 				return
 			}
 			require.ErrorIs(t, err, tt.wantErr)
-			// TODO check that the command is created correctly https://github.com/SmotrovaLilit/golang-reference-application/issues/16
 		})
 	}
 }

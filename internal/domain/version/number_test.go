@@ -16,28 +16,28 @@ func TestNewNumber(t *testing.T) {
 	}{
 		{
 			name:          "success to create number",
-			rawNumber:     "1.0.0",
+			rawNumber:     " 1.0.0 ",
 			want:          MustNewNumber("1.0.0"),
 			wantErr:       nil,
 			wantErrString: "",
 		},
 		{
 			name:          "empty number",
-			rawNumber:     "",
+			rawNumber:     "   ",
 			want:          "",
 			wantErr:       ErrNumberLength,
 			wantErrString: "invalid version number length: number must be at least 1 characters long",
 		},
 		{
 			name:          "long number",
-			rawNumber:     strings.Repeat("1", 16),
+			rawNumber:     strings.Repeat("1", numberMaxLength+1),
 			want:          "",
 			wantErr:       ErrNumberLength,
 			wantErrString: "invalid version number length: number must be at most 15 characters long",
 		},
 		{
 			name:          "invalid number",
-			rawNumber:     "12-12",
+			rawNumber:     " 12-12 ",
 			want:          "",
 			wantErr:       ErrInvalidVersionNumber,
 			wantErrString: "invalid version number",

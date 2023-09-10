@@ -1,4 +1,4 @@
-package updateprogramversion
+package approveprogramversion
 
 import (
 	"context"
@@ -7,7 +7,6 @@ import (
 	"reference-application/internal/application/interfaces/repositories"
 	"reference-application/internal/application/sharederrors"
 	"reference-application/internal/domain/version"
-	"reference-application/internal/pkg/optional"
 )
 
 var Set = wire.NewSet(
@@ -17,10 +16,7 @@ var Set = wire.NewSet(
 
 // Command is a command to update a version.
 type Command struct {
-	id          version.ID
-	name        version.Name
-	description optional.Optional[version.Description]
-	number      optional.Optional[version.Number]
+	id version.ID
 }
 
 // Handler is a handler to update a version.
@@ -31,15 +27,9 @@ type Handler struct {
 // NewCommand is a constructor for Command.
 func NewCommand(
 	id version.ID,
-	name version.Name,
-	description optional.Optional[version.Description],
-	number optional.Optional[version.Number],
 ) Command {
 	return Command{
-		id:          id,
-		name:        name,
-		description: description,
-		number:      number,
+		id: id,
 	}
 }
 
@@ -49,7 +39,7 @@ func (h Handler) Handle(ctx context.Context, cmd Command) error {
 	if _version == nil {
 		return sharederrors.ErrVersionNotFound
 	}
-	err := _version.Update(cmd.name, cmd.description, cmd.number)
+	err := _version.Approve()
 	if err != nil {
 		return err
 	}

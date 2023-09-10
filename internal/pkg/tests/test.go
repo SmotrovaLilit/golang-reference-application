@@ -46,6 +46,16 @@ func (tdb TestWithDatabase) PrepareVersionOnReview(t *testing.T) version.Version
 	return _version
 }
 
+// PrepareDraftVersionReadyToReview creates a prepared to review draft version in the database and returns it.
+func (tdb TestWithDatabase) PrepareDraftVersionReadyToReview(t *testing.T) version.Version {
+	_version, _program := NewPreparedToReviewVersion()
+	versionRepository := repositories.NewVersionRepository(tdb.DB)
+	programRepository := repositories.NewProgramRepository(tdb.DB)
+	programRepository.Save(context.TODO(), _program)
+	versionRepository.Save(context.TODO(), _version)
+	return _version
+}
+
 // PrepareIntegrationTest starts the server and returns the address of the server and a database connection.
 // The server is killed when the test is finished.
 func PrepareIntegrationTest(t *testing.T) IntegrationTest {
