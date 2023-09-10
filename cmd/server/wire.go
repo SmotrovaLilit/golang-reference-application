@@ -12,6 +12,7 @@ import (
 	"net/http"
 	"reference-application/internal/application"
 	"reference-application/internal/application/commands/createprogram"
+	"reference-application/internal/application/commands/sendtoreviewprogramversion"
 	"reference-application/internal/application/commands/updateprogramversion"
 	"reference-application/internal/infrastructure/repositories"
 	infrastructurehttp "reference-application/internal/infrastructure/transports/http"
@@ -47,6 +48,7 @@ func NewApplication(
 		application.Set,
 		createprogram.Set,
 		updateprogramversion.Set,
+		sendtoreviewprogramversion.Set,
 		repositories.Set,
 	)
 	return Application{}

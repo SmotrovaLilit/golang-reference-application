@@ -36,3 +36,20 @@ func NewOnReviewVersion() (version.Version, program.Program) {
 	)
 	return _version, _program
 }
+
+// NewPreparedToReviewVersion returns a new draft version prepared to review.
+func NewPreparedToReviewVersion() (version.Version, program.Program) {
+	_program := program.NewProgram(
+		program.MustNewID("d942802b-02a2-4ac2-ab78-28f89aed2994"),
+		program.IPhonePlatformCode,
+	)
+	_version := version.NewExistingVersion(
+		version.MustNewID("b2082806-3d32-48d4-9fe4-ce67b22be21e"),
+		"ios-smart-calculator",
+		_program.ID(),
+		version.DraftStatus,
+		optional.Of(version.MustNewDescription("description")),
+		optional.Of(version.MustNewNumber("1.0.0")),
+	)
+	return _version, _program
+}
