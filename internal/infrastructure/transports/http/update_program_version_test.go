@@ -2,6 +2,7 @@ package http
 
 import (
 	"context"
+	"fmt"
 	"github.com/gorilla/mux"
 	"github.com/stretchr/testify/require"
 	"net/http"
@@ -67,7 +68,7 @@ func TestDecodeUpdateProgramVersionRequest(t *testing.T) {
 			request: mux.SetURLVars(httptest.NewRequest(
 				http.MethodPut,
 				"/versions/11a111cf-91f3-49dc-bb6d-ac4235635411",
-				strings.NewReader(`{"name":"new-name", "description": "sh"}`),
+				strings.NewReader(fmt.Sprintf(`{"name":"new-name", "description": "%s"}`, strings.Repeat("1", 10001))),
 			), map[string]string{"id": "11a111cf-91f3-49dc-bb6d-ac4235635411"}),
 			wantErr: version.ErrDescriptionLength,
 		},

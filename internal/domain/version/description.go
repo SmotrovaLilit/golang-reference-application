@@ -7,6 +7,7 @@ import (
 
 // ErrDescriptionLength is an error for invalid version description length.
 var ErrDescriptionLength = errorswithcode.NewValidationErrorWithCode("invalid version description length", "INVALID_VERSION_DESCRIPTION_LENGTH")
+var ErrEmptyDescription = errorswithcode.NewValidationErrorWithCode("description is empty", "EMPTY_DESCRIPTION")
 
 // Description is a type for version description.
 type Description string
@@ -18,12 +19,8 @@ const (
 
 // NewDescription is a constructor for Description.
 func NewDescription(raw string) (Description, error) {
-	if len(raw) < descriptionMinLength {
-		return "", fmt.Errorf(
-			"%w: description must be at least %d characters long",
-			ErrDescriptionLength,
-			descriptionMinLength,
-		)
+	if raw == "" {
+		return "", ErrEmptyDescription
 	}
 	if len(raw) > descriptionMaxLength {
 		return "", fmt.Errorf(
