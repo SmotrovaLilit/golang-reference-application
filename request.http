@@ -17,10 +17,16 @@ Content-Type: application/json
 {
   "name": "new name",
   "description": "new description",
-  "number": "1.0.1",
+  "number": "1.0.1"
 }
 
 ###
 PUT http://localhost:8080/versions/11a111cf-91f3-49dc-bb6d-ac4235635411/approve
+Content-Type: application/json
+
+
+
+###
+PUT http://localhost:8080/versions/11a111cf-91f3-49dc-bb6d-ac4235635411/decline
 Content-Type: application/json
 
