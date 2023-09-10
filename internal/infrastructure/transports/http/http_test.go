@@ -64,6 +64,11 @@ func Test_convertErrorToApiError(t *testing.T) {
 			want:  `{"error":"invalid version description length","code":"INVALID_VERSION_DESCRIPTION_LENGTH"}`,
 		},
 		{
+			name:  "err version number is empty",
+			input: version.ErrEmptyNumber,
+			want:  `{"error":"number is empty","code":"EMPTY_NUMBER"}`,
+		},
+		{
 			name:  "err version description is empty",
 			input: version.ErrEmptyDescription,
 			want:  `{"error":"description is empty","code":"EMPTY_DESCRIPTION"}`,
