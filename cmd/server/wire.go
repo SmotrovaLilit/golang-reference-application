@@ -11,6 +11,7 @@ import (
 	"net"
 	"net/http"
 	"reference-application/internal/application"
+	"reference-application/internal/application/commands/approveprogramversion"
 	"reference-application/internal/application/commands/createprogram"
 	"reference-application/internal/application/commands/sendtoreviewprogramversion"
 	"reference-application/internal/application/commands/updateprogramversion"
@@ -49,6 +50,7 @@ func NewApplication(
 		createprogram.Set,
 		updateprogramversion.Set,
 		sendtoreviewprogramversion.Set,
+		approveprogramversion.Set,
 		repositories.Set,
 	)
 	return Application{}
