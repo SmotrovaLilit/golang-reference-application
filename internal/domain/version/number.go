@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"reference-application/internal/pkg/errorswithcode"
 	"regexp"
+	"strings"
 )
 
 // ErrNumberLength is an error for invalid version number length.
@@ -23,6 +24,7 @@ var versionRegexp = regexp.MustCompile(`^(0|[1-9][0-9]*)(\.(0|[1-9][0-9]*))*$`)
 
 // NewNumber is a constructor for Number.
 func NewNumber(raw string) (Number, error) {
+	raw = strings.Trim(raw, " ")
 	if len(raw) < numberMinLength {
 		return "", fmt.Errorf(
 			"%w: number must be at least %d characters long",

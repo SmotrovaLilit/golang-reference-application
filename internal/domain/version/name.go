@@ -3,6 +3,7 @@ package version
 import (
 	"fmt"
 	"reference-application/internal/pkg/errorswithcode"
+	"strings"
 )
 
 // ErrNameLength is an error for invalid version name length.
@@ -18,6 +19,7 @@ const (
 
 // NewName is a constructor for Name.
 func NewName(raw string) (Name, error) {
+	raw = strings.Trim(raw, " ")
 	if len(raw) < nameMinLength {
 		return "", fmt.Errorf(
 			"%w: name must be at least %d characters long",

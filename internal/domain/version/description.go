@@ -3,6 +3,7 @@ package version
 import (
 	"fmt"
 	"reference-application/internal/pkg/errorswithcode"
+	"strings"
 )
 
 // ErrDescriptionLength is an error for invalid version description length.
@@ -19,6 +20,7 @@ const (
 
 // NewDescription is a constructor for Description.
 func NewDescription(raw string) (Description, error) {
+	raw = strings.Trim(raw, " ")
 	if raw == "" {
 		return "", ErrEmptyDescription
 	}

@@ -16,20 +16,20 @@ func TestNewDescription(t *testing.T) {
 	}{
 		{
 			name:    "success to create description",
-			raw:     "sun",
-			want:    MustNewDescription("sun"),
+			raw:     " " + strings.Repeat("1", descriptionMaxLength) + " ",
+			want:    MustNewDescription(strings.Repeat("1", descriptionMaxLength)),
 			wantErr: nil,
 		},
 		{
 			name:          "empty description",
-			raw:           "",
+			raw:           "      ",
 			want:          "",
 			wantErr:       ErrEmptyDescription,
 			wantErrString: "description is empty",
 		},
 		{
 			name:          "long description",
-			raw:           strings.Repeat("1", 10001),
+			raw:           strings.Repeat("1", descriptionMaxLength+1),
 			want:          "",
 			wantErr:       ErrDescriptionLength,
 			wantErrString: "invalid version description length: description must be at most 10000 characters long",
@@ -58,12 +58,12 @@ func TestDescription_canSendToReview(t *testing.T) {
 	}{
 		{
 			name:        "success",
-			description: MustNewDescription(strings.Repeat("1", 10)),
+			description: MustNewDescription(strings.Repeat("1", descriptionMinLength)),
 			wantErr:     nil,
 		},
 		{
 			name:          "short description",
-			description:   MustNewDescription(strings.Repeat("1", 9)),
+			description:   MustNewDescription(strings.Repeat("1", descriptionMinLength-1)),
 			wantErr:       ErrDescriptionLength,
 			wantErrString: "invalid version description length: description must be at least 10 characters long",
 		},
