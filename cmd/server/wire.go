@@ -13,6 +13,7 @@ import (
 	"reference-application/internal/application"
 	"reference-application/internal/application/commands/approveprogramversion"
 	"reference-application/internal/application/commands/createprogram"
+	"reference-application/internal/application/commands/declineprogramversion"
 	"reference-application/internal/application/commands/sendtoreviewprogramversion"
 	"reference-application/internal/application/commands/updateprogramversion"
 	"reference-application/internal/infrastructure/repositories"
@@ -51,6 +52,7 @@ func NewApplication(
 		updateprogramversion.Set,
 		sendtoreviewprogramversion.Set,
 		approveprogramversion.Set,
+		declineprogramversion.Set,
 		repositories.Set,
 	)
 	return Application{}
