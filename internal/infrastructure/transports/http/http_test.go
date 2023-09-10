@@ -5,7 +5,7 @@ import (
 	stdErrors "errors"
 	"github.com/stretchr/testify/require"
 	"net/http/httptest"
-	"reference-application/internal/application/commands/updateprogramversion"
+	"reference-application/internal/application/sharederrors"
 	"reference-application/internal/domain/program"
 	"reference-application/internal/domain/version"
 	"testing"
@@ -50,7 +50,7 @@ func Test_convertErrorToApiError(t *testing.T) {
 		},
 		{
 			name:  "err version not found",
-			input: updateprogramversion.ErrVersionNotFound,
+			input: sharederrors.ErrVersionNotFound,
 			want:  `{"error":"version not found","code":"NOT_FOUND"}`,
 		},
 		{

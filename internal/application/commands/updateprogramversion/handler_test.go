@@ -4,6 +4,7 @@ import (
 	"context"
 	"github.com/stretchr/testify/require"
 	"reference-application/internal/application/commands/updateprogramversion"
+	"reference-application/internal/application/sharederrors"
 	"reference-application/internal/domain/version"
 	"reference-application/internal/infrastructure/repositories"
 	"reference-application/internal/pkg/optional"
@@ -65,7 +66,7 @@ func TestHandler_HandleVersionNotFound(t *testing.T) {
 	err := handler.Handle(context.TODO(), cmd)
 
 	// Test assertions
-	require.ErrorIs(t, err, updateprogramversion.ErrVersionNotFound)
+	require.ErrorIs(t, err, sharederrors.ErrVersionNotFound)
 }
 
 func TestHandler_HandleErrorFromDomainUpdateVersion(t *testing.T) {
