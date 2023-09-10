@@ -18,6 +18,7 @@ func NewHandler(endpoints application.Endpoints) http.Handler {
 	r.Handle("/versions/{id}", newUpdateProgramVersionHandler(endpoints.UpdateProgramVersionEndpoint)).Methods(http.MethodPut)
 	r.Handle("/versions/{id}/sendToReview", newSendToReviewProgramVersionHandler(endpoints.SendToReviewProgramVersionEndpoint)).Methods(http.MethodPut)
 	r.Handle("/versions/{id}/approve", newApproveProgramVersionHandler(endpoints.ApproveProgramVersionEndpoint)).Methods(http.MethodPut)
+	r.Handle("/versions/{id}/decline", newDeclineProgramVersionHandler(endpoints.DeclineProgramVersionEndpoint)).Methods(http.MethodPut)
 	return r
 }
 

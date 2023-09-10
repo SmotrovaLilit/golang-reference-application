@@ -137,6 +137,67 @@ func TestStatus_approve(t *testing.T) {
 	}
 }
 
+func TestStatus_IsDeclined(t *testing.T) {
+	tests := []struct {
+		name string
+		s    Status
+		want bool
+	}{
+		{
+			name: "success",
+			s:    DeclinedStatus,
+			want: true,
+		},
+		{
+			name: "failed",
+			s:    ApprovedStatus,
+			want: false,
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			got := tt.s.IsDeclined()
+			require.Equal(t, tt.want, got)
+		})
+	}
+}
+
+func TestStatus_decline(t *testing.T) {
+	tests := []struct {
+		name    string
+		s       Status
+		want    Status
+		wantErr error
+	}{
+		{
+			name: "success",
+			s:    OnReviewStatus,
+			want: DeclinedStatus,
+		},
+		{
+			name:    "from_draft",
+			s:       DraftStatus,
+			wantErr: ErrInvalidStatusToDecline,
+		},
+		{
+			name:    "from_approved",
+			s:       ApprovedStatus,
+			wantErr: ErrInvalidStatusToDecline,
+		},
+		{
+			name:    "from_declined",
+			s:       DeclinedStatus,
+			wantErr: ErrInvalidStatusToDecline,
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			got, err := tt.s.decline()
+			require.ErrorIs(t, err, tt.wantErr)
+			require.Equal(t, tt.want, got)
+		})
+	}
+}
 func TestMustNewStatus(t *testing.T) {
 	tests := []struct {
 		name string
@@ -157,6 +218,11 @@ func TestMustNewStatus(t *testing.T) {
 			name: "approved status",
 			raw:  "APPROVED",
 			want: ApprovedStatus,
+		},
+		{
+			name: "declined status",
+			raw:  "DECLINED",
+			want: DeclinedStatus,
 		},
 	}
 	for _, tt := range tests {
