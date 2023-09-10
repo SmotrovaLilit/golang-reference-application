@@ -68,6 +68,16 @@ func Test_convertErrorToApiError(t *testing.T) {
 			input: version.ErrEmptyDescription,
 			want:  `{"error":"description is empty","code":"EMPTY_DESCRIPTION"}`,
 		},
+		{
+			name:  "err invalid status to send to review",
+			input: version.ErrInvalidStatusToSendToReview,
+			want:  `{"error":"invalid status to send to review","code":"INVALID_STATUS_TO_SEND_TO_REVIEW"}`,
+		},
+		{
+			name:  "err empty number",
+			input: version.ErrEmptyNumber,
+			want:  `{"error":"number is empty","code":"EMPTY_NUMBER"}`,
+		},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {

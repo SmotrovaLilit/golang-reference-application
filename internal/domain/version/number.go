@@ -8,7 +8,7 @@ import (
 
 // ErrNumberLength is an error for invalid version number length.
 var ErrNumberLength = errorswithcode.NewValidationErrorWithCode("invalid version number length", "INVALID_VERSION_NUMBER_LENGTH")
-
+var ErrEmptyNumber = errorswithcode.NewValidationErrorWithCode("number is empty", "EMPTY_NUMBER")
 var ErrInvalidVersionNumber = errorswithcode.NewValidationErrorWithCode("invalid version number", "INVALID_VERSION_NUMBER")
 
 // Number is a type for version number.

@@ -54,3 +54,28 @@ func TestStatus_canUpdate(t *testing.T) {
 		})
 	}
 }
+
+func TestStatus_IsOnReview(t *testing.T) {
+	tests := []struct {
+		name string
+		s    Status
+		want bool
+	}{
+		{
+			name: "success",
+			s:    OnReviewStatus,
+			want: true,
+		},
+		{
+			name: "failed",
+			s:    DraftStatus,
+			want: false,
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			got := tt.s.IsOnReview()
+			require.Equal(t, tt.want, got)
+		})
+	}
+}

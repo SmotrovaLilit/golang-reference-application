@@ -46,3 +46,15 @@ func MustNewDescription(raw string) Description {
 func (n Description) String() string {
 	return string(n)
 }
+
+// canSendToReview checks if a version description allows to send version to review.
+func (n Description) canSendToReview() error {
+	if len(n.String()) < descriptionMinLength {
+		return fmt.Errorf(
+			"%w: description must be at least %d characters long",
+			ErrDescriptionLength,
+			descriptionMinLength,
+		)
+	}
+	return nil
+}

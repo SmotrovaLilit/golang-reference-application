@@ -48,3 +48,35 @@ func TestNewDescription(t *testing.T) {
 		})
 	}
 }
+
+func TestDescription_canSendToReview(t *testing.T) {
+	tests := []struct {
+		name          string
+		description   Description
+		wantErr       error
+		wantErrString string
+	}{
+		{
+			name:        "success",
+			description: MustNewDescription(strings.Repeat("1", 10)),
+			wantErr:     nil,
+		},
+		{
+			name:          "short description",
+			description:   MustNewDescription(strings.Repeat("1", 9)),
+			wantErr:       ErrDescriptionLength,
+			wantErrString: "invalid version description length: description must be at least 10 characters long",
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			err := tt.description.canSendToReview()
+			if tt.wantErr != nil {
+				require.ErrorIs(t, err, tt.wantErr)
+				require.Equal(t, tt.wantErrString, err.Error())
+				return
+			}
+			require.NoError(t, err)
+		})
+	}
+}
