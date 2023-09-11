@@ -1,4 +1,4 @@
-# 2023-07: Errors in repositories
+# 2023-07: Errors in Repositories
 My decision:
 - An error when the application loses connection with the database or other unexpected error from the database, there will be a panic and the http server will return an internal error.
 - An error when id UUID is busy is not a business error, there will be panic too and the http server will return an internal error.

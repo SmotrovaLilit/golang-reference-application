@@ -1,4 +1,4 @@
-# Decisions about testing the application
+# Decisions About Testing the Application
 ## 2023-08: Application layer with real database or with mocking the repository layer
 I chose to use a real database in application layer tests.
 - It makes it easy to do refactoring. We can change repository interface, and it doesn't require changing in application tests.

@@ -1,0 +1,63 @@
+@startuml
+left to right direction
+namespace programAggregate <<Rectangle>> {
+
+      class Program as "Program" <<RootEntity>> #coral {
+      id
+      platformCode
+    }
+    class ID as "ID" <<ValueObject>>  #gray {
+
+    }
+    class PlatformCode as "PlatformCode" <<ValueObject>>  #gray {
+
+    }
+    Program *-- ID: contains
+    Program *-- PlatformCode: contains
+}
+
+namespace versionAggregate <<Rectangle>> {
+      class Version as "Version" <<RootEntity>> #coral {
+      id
+      name
+      description
+      status
+      number
+      Update(name, description, number)
+      SendToReview()
+      Approve()
+      Decline()
+      }
+
+      class Status as "Status" <<ValueObject>>  #gray {
+      sendToReview()
+      approve()
+      decline()
+      canUpdate()
+      }
+
+      class Description as "Description" <<ValueObject>>  #gray {
+      canSendToReview()
+      }
+      class Number as "Number" <<ValueObject>>  #gray {
+
+      }
+      class Name as "Name" <<ValueObject>>  #gray {
+
+      }
+      class ID as "ID" <<ValueObject>>  #gray {
+
+      }
+      class ProgramId as "programs.ID" <<ValueObject>>  #gray {
+
+      }
+      Version *-- ID: contains
+      Version *-- Status: contains
+      Version *-- Name: contains
+      Version *-- Number: contains
+      Version *-- Description: contains
+      Version *-- ProgramId
+}
+programAggregate.Program  <--  versionAggregate.ProgramId
+
+@enduml
