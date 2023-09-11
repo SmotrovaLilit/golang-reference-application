@@ -1,0 +1,10 @@
+@startuml
+scale 600 width
+
+[*] --> DRAFT
+DRAFT --> ON_REVIEW
+ON_REVIEW --> APPROVED
+ON_REVIEW --> DECLINED
+
+
+@enduml
