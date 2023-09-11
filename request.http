@@ -30,3 +30,7 @@ Content-Type: application/json
 PUT http://localhost:8080/versions/11a111cf-91f3-49dc-bb6d-ac4235635411/decline
 Content-Type: application/json
 
+###
+GET http://localhost:8080/store/programs
+Content-Type: application/json
+

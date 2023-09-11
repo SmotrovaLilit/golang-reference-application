@@ -13,6 +13,7 @@ import (
 	"net"
 	"os"
 	"os/exec"
+	"reference-application/internal/domain/program"
 	"reference-application/internal/domain/version"
 	"reference-application/internal/infrastructure/repositories"
 	"testing"
@@ -54,6 +55,22 @@ func (tdb TestWithDatabase) PrepareDraftVersionReadyToReview(t *testing.T) versi
 	programRepository.Save(context.TODO(), _program)
 	versionRepository.Save(context.TODO(), _version)
 	return _version
+}
+
+// SavePrograms saves programs to the database.
+func (tdb TestWithDatabase) SavePrograms(t *testing.T, programs []program.Program) {
+	programRepository := repositories.NewProgramRepository(tdb.DB)
+	for _, _program := range programs {
+		programRepository.Save(context.Background(), _program)
+	}
+}
+
+// SaveVersions saves versions to the database.
+func (tdb TestWithDatabase) SaveVersions(t *testing.T, versions []version.Version) {
+	versionRepository := repositories.NewVersionRepository(tdb.DB)
+	for _, _version := range versions {
+		versionRepository.Save(context.Background(), _version)
+	}
 }
 
 // PrepareIntegrationTest starts the server and returns the address of the server and a database connection.

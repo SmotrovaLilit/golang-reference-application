@@ -17,6 +17,8 @@ import (
 	"reference-application/internal/application/commands/declineprogramversion"
 	"reference-application/internal/application/commands/sendtoreviewprogramversion"
 	"reference-application/internal/application/commands/updateprogramversion"
+	"reference-application/internal/application/queries/approvedprograms"
+	"reference-application/internal/infrastructure/readmodels"
 	"reference-application/internal/infrastructure/repositories"
 	"reference-application/internal/infrastructure/transports/http"
 )
@@ -46,12 +48,18 @@ func NewApplication(db *gorm.DB, addr HTTPAddr) Application {
 		Repository: versionRepository,
 	}
 	declineprogramversionEndpoint := declineprogramversion.NewEndpoint(declineprogramversionHandler)
+	approvedProgramsReadModel := readmodels.NewApprovedProgramsReadModel(db)
+	approvedprogramsHandler := approvedprograms.Handler{
+		ReadModel: approvedProgramsReadModel,
+	}
+	approvedprogramsEndpoint := approvedprograms.NewEndpoint(approvedprogramsHandler)
 	endpoints := application.Endpoints{
 		CreateProgramEndpoint:              endpoint,
 		UpdateProgramVersionEndpoint:       updateprogramversionEndpoint,
 		SendToReviewProgramVersionEndpoint: sendtoreviewprogramversionEndpoint,
 		ApproveProgramVersionEndpoint:      approveprogramversionEndpoint,
 		DeclineProgramVersionEndpoint:      declineprogramversionEndpoint,
+		ApprovedProgramsEndpoint:           approvedprogramsEndpoint,
 	}
 	httpHandler := http.NewHandler(endpoints)
 	mainApplication := Application{

@@ -31,8 +31,8 @@ func NewOnReviewVersion() (version.Version, program.Program) {
 		"ios-smart-calculator",
 		_program.ID(),
 		version.OnReviewStatus,
-		optional.Empty[version.Description](),
-		optional.Empty[version.Number](),
+		optional.Of(version.MustNewDescription("description")),
+		optional.Of(version.MustNewNumber("1.0.0")),
 	)
 	return _version, _program
 }
@@ -52,4 +52,51 @@ func NewPreparedToReviewVersion() (version.Version, program.Program) {
 		optional.Of(version.MustNewNumber("1.0.0")),
 	)
 	return _version, _program
+}
+
+// NewProgram returns a new program.
+func NewProgram(id program.ID) program.Program {
+	return program.NewProgram(
+		id,
+		program.AndroidPlatformCode,
+	)
+}
+
+// NewDraftVersionInProgram returns a new draft version in the program.
+func NewDraftVersionInProgram(program program.Program, versionID version.ID) version.Version {
+	name := version.MustNewName("ios-smart-calculator" + versionID.String())
+	return version.NewExistingVersion(
+		versionID,
+		name,
+		program.ID(),
+		version.DraftStatus,
+		optional.Empty[version.Description](),
+		optional.Empty[version.Number](),
+	)
+}
+
+// NewApprovedVersionInProgram returns a new approved version in the program.
+func NewApprovedVersionInProgram(program program.Program, versionID version.ID) version.Version {
+	name := version.MustNewName("ios-smart-calculator" + versionID.String())
+	return version.NewExistingVersion(
+		versionID,
+		name,
+		program.ID(),
+		version.ApprovedStatus,
+		optional.Of(version.MustNewDescription("description")),
+		optional.Of(version.MustNewNumber("1.0.0")),
+	)
+}
+
+// NewOnReviewVersionInProgram returns a new version on review in the program.
+func NewOnReviewVersionInProgram(program program.Program, versionID version.ID) version.Version {
+	name := version.MustNewName("ios-smart-calculator" + versionID.String())
+	return version.NewExistingVersion(
+		versionID,
+		name,
+		program.ID(),
+		version.OnReviewStatus,
+		optional.Of(version.MustNewDescription("description")),
+		optional.Of(version.MustNewNumber("1.0.0")),
+	)
 }
