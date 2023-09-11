@@ -7,6 +7,7 @@ import (
 	"reference-application/internal/application/commands/declineprogramversion"
 	"reference-application/internal/application/commands/sendtoreviewprogramversion"
 	"reference-application/internal/application/commands/updateprogramversion"
+	"reference-application/internal/application/queries/approvedprograms"
 )
 
 type Endpoints struct {
@@ -15,6 +16,7 @@ type Endpoints struct {
 	SendToReviewProgramVersionEndpoint sendtoreviewprogramversion.Endpoint
 	ApproveProgramVersionEndpoint      approveprogramversion.Endpoint
 	DeclineProgramVersionEndpoint      declineprogramversion.Endpoint
+	ApprovedProgramsEndpoint           approvedprograms.Endpoint
 }
 
 var Set = wire.NewSet(
