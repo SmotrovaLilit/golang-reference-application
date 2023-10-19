@@ -1,13 +1,14 @@
 package main
 
 import (
+	"errors"
 	"gorm.io/driver/postgres"
 	"gorm.io/driver/sqlite"
 	"gorm.io/gorm"
 	"reference-application/internal/infrastructure/repositories"
 )
 
-func ConnectDB(dbType, dsn string) *gorm.DB {
+func ConnectDB(dbType, dsn string) (*gorm.DB, error) {
 	var err error
 	var db *gorm.DB
 
@@ -18,12 +19,12 @@ func ConnectDB(dbType, dsn string) *gorm.DB {
 		db, err = gorm.Open(postgres.Open(dsn), &gorm.Config{})
 	}
 	if err != nil {
-		panic("failed to connect database")
+		return nil, errors.New("failed to connect database")
 	}
 	err = db.AutoMigrate(repositories.ProgramModel{}, repositories.VersionModel{})
 	if err != nil {
-		panic("failed to migrate database")
+		return nil, errors.New("failed to migrate database")
 	}
 
-	return db
+	return db, nil
 }

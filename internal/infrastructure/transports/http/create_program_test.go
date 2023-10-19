@@ -3,6 +3,7 @@ package http
 import (
 	"context"
 	"github.com/stretchr/testify/require"
+	"log/slog"
 	"net/http"
 	"net/http/httptest"
 	"reference-application/internal/application/commands/createprogram"
@@ -91,7 +92,7 @@ func TestDecodeCreateProgramRequest(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			got, err := decodeCreateProgramRequest(context.TODO(), tt.request)
+			got, err := decodeCreateProgramRequest(slog.Default())(context.TODO(), tt.request)
 			if tt.wantErr == nil {
 				require.NoError(t, err)
 				require.Equal(t, tt.want, got)

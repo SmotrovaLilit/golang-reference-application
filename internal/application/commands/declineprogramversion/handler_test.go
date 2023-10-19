@@ -3,6 +3,7 @@ package declineprogramversion_test
 import (
 	"context"
 	"github.com/stretchr/testify/require"
+	"log/slog"
 	"reference-application/internal/application/commands/declineprogramversion"
 	"reference-application/internal/application/sharederrors"
 	"reference-application/internal/domain/version"
@@ -16,7 +17,9 @@ func TestHandler_Handle(t *testing.T) {
 	versionRepository := repositories.NewVersionRepository(dbTest.DB)
 	handler := declineprogramversion.Handler{
 		Repository: versionRepository,
+		Logger:     slog.Default(),
 	}
+	endpoint := declineprogramversion.NewEndpoint(handler)
 
 	// Prepare test data
 	existingVersion := dbTest.PrepareVersionOnReview(t)
@@ -25,7 +28,7 @@ func TestHandler_Handle(t *testing.T) {
 	cmd := declineprogramversion.NewCommand(
 		existingVersion.ID(),
 	)
-	err := handler.Handle(context.TODO(), cmd)
+	_, err := endpoint(context.TODO(), cmd)
 
 	// Test assertions
 	require.NoError(t, err)
@@ -39,7 +42,9 @@ func TestHandler_HandleVersionNotFound(t *testing.T) {
 	versionRepository := repositories.NewVersionRepository(dbTest.DB)
 	handler := declineprogramversion.Handler{
 		Repository: versionRepository,
+		Logger:     slog.Default(),
 	}
+	endpoint := declineprogramversion.NewEndpoint(handler)
 
 	// Prepare test data
 	_version, _ := tests.NewOnReviewVersion()
@@ -49,7 +54,7 @@ func TestHandler_HandleVersionNotFound(t *testing.T) {
 	cmd := declineprogramversion.NewCommand(
 		versionID,
 	)
-	err := handler.Handle(context.TODO(), cmd)
+	_, err := endpoint(context.TODO(), cmd)
 
 	// Test assertions
 	require.ErrorIs(t, err, sharederrors.ErrVersionNotFound)
@@ -60,7 +65,9 @@ func TestHandler_HandleErrorFromDomain(t *testing.T) {
 	versionRepository := repositories.NewVersionRepository(dbTest.DB)
 	handler := declineprogramversion.Handler{
 		Repository: versionRepository,
+		Logger:     slog.Default(),
 	}
+	endpoint := declineprogramversion.NewEndpoint(handler)
 
 	// Prepare test data
 	existingVersion := dbTest.PrepareDraftVersion(t)
@@ -69,8 +76,16 @@ func TestHandler_HandleErrorFromDomain(t *testing.T) {
 	cmd := declineprogramversion.NewCommand(
 		existingVersion.ID(),
 	)
-	err := handler.Handle(context.TODO(), cmd)
+	_, err := endpoint(context.TODO(), cmd)
 
 	// Test assertions
 	require.ErrorIs(t, err, version.ErrInvalidStatusToDecline)
+}
+
+func TestHandler_Endpoint(t *testing.T) {
+	t.Run("endpoint should return resource name and action", func(t *testing.T) {
+		endpoint := declineprogramversion.NewEndpoint(declineprogramversion.Handler{})
+		require.Equal(t, "programVersion", endpoint.ResourceName())
+		require.Equal(t, "decline", endpoint.ResourceAction())
+	})
 }

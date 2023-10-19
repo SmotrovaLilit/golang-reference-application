@@ -10,6 +10,7 @@ import (
 	"database/sql"
 	"fmt"
 	"gorm.io/gorm"
+	"log/slog"
 	"net"
 	http2 "net/http"
 	"reference-application/internal/application"
@@ -26,27 +27,33 @@ import (
 
 // Injectors from wire.go:
 
-func NewApplication(db *gorm.DB, addr HTTPAddr) (Application, error) {
+func NewApplication(db *gorm.DB, addr HTTPAddr, logger *slog.Logger) (Application, error) {
 	unitOfWork := repositories.NewUnitOfWork(db)
 	handler := createprogram.Handler{
 		UnitOfWork: unitOfWork,
+		Logger:     logger,
 	}
 	endpoint := createprogram.NewEndpoint(handler)
 	versionRepository := repositories.NewVersionRepository(db)
 	updateprogramversionHandler := updateprogramversion.Handler{
 		Repository: versionRepository,
+		Logger:     logger,
 	}
 	updateprogramversionEndpoint := updateprogramversion.NewEndpoint(updateprogramversionHandler)
 	sendtoreviewprogramversionHandler := sendtoreviewprogramversion.Handler{
 		Repository: versionRepository,
+		Logger:     logger,
 	}
 	sendtoreviewprogramversionEndpoint := sendtoreviewprogramversion.NewEndpoint(sendtoreviewprogramversionHandler)
+	logger := provideLogger()
 	approveprogramversionHandler := approveprogramversion.Handler{
 		Repository: versionRepository,
+		Logger:     logger,
 	}
 	approveprogramversionEndpoint := approveprogramversion.NewEndpoint(approveprogramversionHandler)
 	declineprogramversionHandler := declineprogramversion.Handler{
 		Repository: versionRepository,
+		Logger:     logger,
 	}
 	declineprogramversionEndpoint := declineprogramversion.NewEndpoint(declineprogramversionHandler)
 	approvedProgramsReadModel := readmodels.NewApprovedProgramsReadModel(db)
@@ -66,7 +73,7 @@ func NewApplication(db *gorm.DB, addr HTTPAddr) (Application, error) {
 	if err != nil {
 		return Application{}, err
 	}
-	httpHandler := http.NewHandler(endpoints, sqlDB)
+	httpHandler := http.NewHandler(endpoints, sqlDB, logger)
 	mainApplication := Application{
 		HTTPHandler: httpHandler,
 		HTTPAddr:    addr,

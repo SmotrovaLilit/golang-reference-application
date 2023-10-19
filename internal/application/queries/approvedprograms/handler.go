@@ -5,6 +5,7 @@ import (
 	"github.com/go-kit/kit/endpoint"
 	"github.com/google/wire"
 	"reference-application/internal/pkg/pager"
+	"reference-application/internal/pkg/resource"
 )
 
 // Set is a wire set for programs query.
@@ -58,8 +59,18 @@ func (h Handler) Handle(ctx context.Context, query Query) Result {
 	return h.ReadModel.Query(ctx, query.pager)
 }
 
-// Endpoint is an endpoint for programs query.
+var _ resource.Endpoint = Endpoint(nil)
+
+// Endpoint is an endpoint to update a version.
 type Endpoint endpoint.Endpoint
+
+// ResourceName returns the resource name.
+// It uses for logging.
+func (e Endpoint) ResourceName() string { return "program" }
+
+// ResourceAction returns the resource action.
+// It uses for logging.
+func (e Endpoint) ResourceAction() string { return "get" }
 
 // NewEndpoint creates a new endpoint for programs query.
 func NewEndpoint(handler Handler) Endpoint {

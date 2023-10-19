@@ -4,6 +4,7 @@ import (
 	"context"
 	"github.com/gorilla/mux"
 	"github.com/stretchr/testify/require"
+	"log/slog"
 	"net/http"
 	"net/http/httptest"
 	"reference-application/internal/application/commands/approveprogramversion"
@@ -43,7 +44,7 @@ func Test_decodeApproveProgramVersionRequest(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			t.Run(tt.name, func(t *testing.T) {
-				got, err := decodeApproveProgramVersionRequest(context.TODO(), tt.request)
+				got, err := decodeApproveProgramVersionRequest(slog.Default())(context.TODO(), tt.request)
 				if tt.wantErr == nil {
 					require.NoError(t, err)
 					require.Equal(t, tt.want, got)
