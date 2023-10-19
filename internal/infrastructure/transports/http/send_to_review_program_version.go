@@ -17,7 +17,7 @@ func newSendToReviewProgramVersionHandler(e sendtoreviewprogramversion.Endpoint)
 		endpoint.Endpoint(e),
 		decodeSendToReviewProgramVersionRequest,
 		xhttp.NoContentResponseEncoder,
-		handlersOptions...,
+		getHandlerOptions("SendToReviewProgramVersion")...,
 	)
 }
 

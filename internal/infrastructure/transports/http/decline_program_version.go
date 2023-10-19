@@ -17,7 +17,7 @@ func newDeclineProgramVersionHandler(e declineprogramversion.Endpoint) http.Hand
 		endpoint.Endpoint(e),
 		decodeDeclineProgramVersionRequest,
 		xhttp.NoContentResponseEncoder,
-		handlersOptions...,
+		getHandlerOptions("DeclineProgramVersion")...,
 	)
 }
 

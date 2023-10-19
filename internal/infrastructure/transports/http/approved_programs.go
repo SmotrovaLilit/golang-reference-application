@@ -17,7 +17,7 @@ func newApprovedProgramsHandler(e approvedprograms.Endpoint) http.Handler {
 		endpoint.Endpoint(e),
 		decodeApprovedProgramsRequest,
 		encodeApprovedProgramsResponse,
-		handlersOptions...,
+		getHandlerOptions("ApprovedPrograms")...,
 	)
 }
 

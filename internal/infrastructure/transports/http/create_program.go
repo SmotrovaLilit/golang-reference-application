@@ -19,7 +19,7 @@ func newCreateProgramHandler(e createprogram.Endpoint) http.Handler {
 		endpoint.Endpoint(e),
 		decodeCreateProgramRequest,
 		xhttp.NoContentResponseEncoder,
-		handlersOptions...,
+		getHandlerOptions("CreateProgram")...,
 	)
 }
 

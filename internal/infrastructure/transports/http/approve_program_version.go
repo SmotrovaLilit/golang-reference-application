@@ -17,7 +17,7 @@ func newApproveProgramVersionHandler(e approveprogramversion.Endpoint) http.Hand
 		endpoint.Endpoint(e),
 		decodeApproveProgramVersionRequest,
 		xhttp.NoContentResponseEncoder,
-		handlersOptions...,
+		getHandlerOptions("ApproveProgramVersion")...,
 	)
 }
 

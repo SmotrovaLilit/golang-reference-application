@@ -23,6 +23,7 @@ Every controversial decision, along with its pros and cons, is documented in the
 It is intended both as a portfolio piece for potential employers and as a personal knowledge base of practical coding solutions that can be re-used in future projects.
 
 ## Plans
+- [ ] Add version handler
 - [ ] Add example of using telegram bot
 - [ ] Add example of using gRPC
 - [ ] Add example of using bus

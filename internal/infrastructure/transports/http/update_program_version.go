@@ -19,7 +19,7 @@ func newUpdateProgramVersionHandler(e updateprogramversion.Endpoint) http.Handle
 		endpoint.Endpoint(e),
 		decodeUpdateProgramVersionRequest,
 		xhttp.NoContentResponseEncoder,
-		handlersOptions...,
+		getHandlerOptions("UpdateProgramVersion")...,
 	)
 }
 
