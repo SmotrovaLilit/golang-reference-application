@@ -5,6 +5,7 @@
 package main
 
 import (
+	"database/sql"
 	"fmt"
 	"github.com/google/wire"
 	"gorm.io/gorm"
@@ -45,9 +46,10 @@ func (app *Application) Serve(l net.Listener) error {
 func NewApplication(
 	db *gorm.DB,
 	addr HTTPAddr,
-) Application {
+) (Application, error) {
 	wire.Build(
 		wire.Struct(new(Application), "*"),
+		provideSQL,
 		infrastructurehttp.NewHandler,
 		application.Set,
 		createprogram.Set,
@@ -59,5 +61,9 @@ func NewApplication(
 		repositories.Set,
 		readmodels.Set,
 	)
-	return Application{}
+	return Application{}, nil
+}
+
+func provideSQL(db *gorm.DB) (*sql.DB, error) {
+	return db.DB()
 }

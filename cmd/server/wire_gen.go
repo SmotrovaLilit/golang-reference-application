@@ -7,6 +7,7 @@
 package main
 
 import (
+	"database/sql"
 	"fmt"
 	"gorm.io/gorm"
 	"net"
@@ -25,7 +26,7 @@ import (
 
 // Injectors from wire.go:
 
-func NewApplication(db *gorm.DB, addr HTTPAddr) Application {
+func NewApplication(db *gorm.DB, addr HTTPAddr) (Application, error) {
 	unitOfWork := repositories.NewUnitOfWork(db)
 	handler := createprogram.Handler{
 		UnitOfWork: unitOfWork,
@@ -61,12 +62,16 @@ func NewApplication(db *gorm.DB, addr HTTPAddr) Application {
 		DeclineProgramVersionEndpoint:      declineprogramversionEndpoint,
 		ApprovedProgramsEndpoint:           approvedprogramsEndpoint,
 	}
-	httpHandler := http.NewHandler(endpoints)
+	sqlDB, err := provideSQL(db)
+	if err != nil {
+		return Application{}, err
+	}
+	httpHandler := http.NewHandler(endpoints, sqlDB)
 	mainApplication := Application{
 		HTTPHandler: httpHandler,
 		HTTPAddr:    addr,
 	}
-	return mainApplication
+	return mainApplication, nil
 }
 
 // wire.go:
@@ -89,4 +94,8 @@ func (app *Application) Run() error {
 
 func (app *Application) Serve(l net.Listener) error {
 	return http2.Serve(l, app.HTTPHandler)
+}
+
+func provideSQL(db *gorm.DB) (*sql.DB, error) {
+	return db.DB()
 }

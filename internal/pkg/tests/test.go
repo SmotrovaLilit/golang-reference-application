@@ -73,6 +73,11 @@ func (tdb TestWithDatabase) SaveVersions(t *testing.T, versions []version.Versio
 	}
 }
 
+// Terminate kills the db container.
+func (tdb TestWithDatabase) Terminate(t *testing.T) {
+	require.NoError(t, tdb.dbContainer.Terminate(context.Background()))
+}
+
 // PrepareIntegrationTest starts the server and returns the address of the server and a database connection.
 // The server is killed when the test is finished.
 func PrepareIntegrationTest(t *testing.T) IntegrationTest {
@@ -107,8 +112,9 @@ func PrepareIntegrationTest(t *testing.T) IntegrationTest {
 }
 
 type TestWithDatabase struct {
-	DB  *gorm.DB
-	DSN string
+	DB          *gorm.DB
+	DSN         string
+	dbContainer testcontainers.Container
 }
 
 // PrepareTestWithDatabase starts a postgres container and returns a database connection.
@@ -120,7 +126,7 @@ func PrepareTestWithDatabase(t *testing.T) TestWithDatabase {
 
 	postgresContainer := runPostgresContainer(t)
 	t.Cleanup(func() {
-		require.NoError(t, postgresContainer.Terminate(context.Background()))
+		_ = postgresContainer.Terminate(context.Background())
 	})
 	dsn, err := postgresContainer.ConnectionString(context.Background(), "sslmode=disable", "application_name=test")
 	require.NoError(t, err)
@@ -135,8 +141,9 @@ func PrepareTestWithDatabase(t *testing.T) TestWithDatabase {
 	require.NoError(t, err)
 
 	return TestWithDatabase{
-		DB:  db,
-		DSN: dsn,
+		DB:          db,
+		DSN:         dsn,
+		dbContainer: postgresContainer,
 	}
 }
 
