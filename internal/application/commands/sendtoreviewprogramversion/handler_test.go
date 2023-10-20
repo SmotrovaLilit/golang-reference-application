@@ -3,6 +3,7 @@ package sendtoreviewprogramversion_test
 import (
 	"context"
 	"github.com/stretchr/testify/require"
+	"log/slog"
 	"reference-application/internal/application/commands/sendtoreviewprogramversion"
 	"reference-application/internal/application/sharederrors"
 	"reference-application/internal/domain/version"
@@ -16,7 +17,9 @@ func TestHandler_Handle(t *testing.T) {
 	versionRepository := repositories.NewVersionRepository(dbTest.DB)
 	handler := sendtoreviewprogramversion.Handler{
 		Repository: versionRepository,
+		Logger:     slog.Default(),
 	}
+	endpoint := sendtoreviewprogramversion.NewEndpoint(handler)
 
 	// Prepare test data
 	existingVersion := dbTest.PrepareDraftVersionReadyToReview(t)
@@ -25,7 +28,7 @@ func TestHandler_Handle(t *testing.T) {
 	cmd := sendtoreviewprogramversion.NewCommand(
 		existingVersion.ID(),
 	)
-	err := handler.Handle(context.TODO(), cmd)
+	_, err := endpoint(context.TODO(), cmd)
 
 	// Test assertions
 	require.NoError(t, err)
@@ -39,7 +42,9 @@ func TestHandler_HandleVersionNotFound(t *testing.T) {
 	versionRepository := repositories.NewVersionRepository(dbTest.DB)
 	handler := sendtoreviewprogramversion.Handler{
 		Repository: versionRepository,
+		Logger:     slog.Default(),
 	}
+	endpoint := sendtoreviewprogramversion.NewEndpoint(handler)
 
 	// Prepare test data
 	_version, _ := tests.NewPreparedToReviewVersion()
@@ -49,7 +54,7 @@ func TestHandler_HandleVersionNotFound(t *testing.T) {
 	cmd := sendtoreviewprogramversion.NewCommand(
 		versionID,
 	)
-	err := handler.Handle(context.TODO(), cmd)
+	_, err := endpoint(context.TODO(), cmd)
 
 	// Test assertions
 	require.ErrorIs(t, err, sharederrors.ErrVersionNotFound)
@@ -60,7 +65,9 @@ func TestHandler_HandleErrorFromDomain(t *testing.T) {
 	versionRepository := repositories.NewVersionRepository(dbTest.DB)
 	handler := sendtoreviewprogramversion.Handler{
 		Repository: versionRepository,
+		Logger:     slog.Default(),
 	}
+	endpoint := sendtoreviewprogramversion.NewEndpoint(handler)
 
 	// Prepare test data
 	existingVersion := dbTest.PrepareVersionOnReview(t)
@@ -69,8 +76,16 @@ func TestHandler_HandleErrorFromDomain(t *testing.T) {
 	cmd := sendtoreviewprogramversion.NewCommand(
 		existingVersion.ID(),
 	)
-	err := handler.Handle(context.TODO(), cmd)
+	_, err := endpoint(context.TODO(), cmd)
 
 	// Test assertions
 	require.ErrorIs(t, err, version.ErrInvalidStatusToSendToReview)
+}
+
+func TestHandler_Endpoint(t *testing.T) {
+	t.Run("endpoint should return resource name and action", func(t *testing.T) {
+		endpoint := sendtoreviewprogramversion.NewEndpoint(sendtoreviewprogramversion.Handler{})
+		require.Equal(t, "programVersion", endpoint.ResourceName())
+		require.Equal(t, "sendToReview", endpoint.ResourceAction())
+	})
 }

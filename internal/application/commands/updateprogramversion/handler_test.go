@@ -3,6 +3,7 @@ package updateprogramversion_test
 import (
 	"context"
 	"github.com/stretchr/testify/require"
+	"log/slog"
 	"reference-application/internal/application/commands/updateprogramversion"
 	"reference-application/internal/application/sharederrors"
 	"reference-application/internal/domain/version"
@@ -17,7 +18,9 @@ func TestHandler_Handle(t *testing.T) {
 	versionRepository := repositories.NewVersionRepository(dbTest.DB)
 	handler := updateprogramversion.Handler{
 		Repository: versionRepository,
+		Logger:     slog.Default(),
 	}
+	endpoint := updateprogramversion.NewEndpoint(handler)
 
 	// Prepare test data
 	versionNewName := version.MustNewName("new-name")
@@ -32,7 +35,7 @@ func TestHandler_Handle(t *testing.T) {
 		newDescription,
 		newNumber,
 	)
-	err := handler.Handle(context.TODO(), cmd)
+	_, err := endpoint(context.TODO(), cmd)
 
 	// Test assertions
 	require.NoError(t, err)
@@ -49,7 +52,9 @@ func TestHandler_HandleVersionNotFound(t *testing.T) {
 	versionRepository := repositories.NewVersionRepository(dbTest.DB)
 	handler := updateprogramversion.Handler{
 		Repository: versionRepository,
+		Logger:     slog.Default(),
 	}
+	endpoint := updateprogramversion.NewEndpoint(handler)
 
 	// Prepare test data
 	_version, _ := tests.NewDraftVersion()
@@ -63,7 +68,7 @@ func TestHandler_HandleVersionNotFound(t *testing.T) {
 		optional.Empty[version.Description](),
 		optional.Empty[version.Number](),
 	)
-	err := handler.Handle(context.TODO(), cmd)
+	_, err := endpoint(context.TODO(), cmd)
 
 	// Test assertions
 	require.ErrorIs(t, err, sharederrors.ErrVersionNotFound)
@@ -74,7 +79,9 @@ func TestHandler_HandleErrorFromDomainUpdateVersion(t *testing.T) {
 	versionRepository := repositories.NewVersionRepository(dbTest.DB)
 	handler := updateprogramversion.Handler{
 		Repository: versionRepository,
+		Logger:     slog.Default(),
 	}
+	endpoint := updateprogramversion.NewEndpoint(handler)
 
 	// Prepare test data
 	existingVersion := dbTest.PrepareVersionOnReview(t)
@@ -88,7 +95,7 @@ func TestHandler_HandleErrorFromDomainUpdateVersion(t *testing.T) {
 		optional.Empty[version.Description](),
 		optional.Empty[version.Number](),
 	)
-	err := handler.Handle(context.TODO(), cmd)
+	_, err := endpoint(context.TODO(), cmd)
 
 	// Test assertions
 	require.ErrorIs(t, err, version.ErrUpdateVersionStatus)

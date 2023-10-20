@@ -23,7 +23,10 @@ Every controversial decision, along with its pros and cons, is documented in the
 It is intended both as a portfolio piece for potential employers and as a personal knowledge base of practical coding solutions that can be re-used in future projects.
 
 ## Plans
-- [ ] Add example of using telegram bot
+- [ ] Add version handler
+- [ ] Add tracer
+- [ ] Add metrics
+- [ ] Add configs
 - [ ] Add example of using gRPC
 - [ ] Add example of using bus
 - [ ] Add example of pessimistic and optimistic locking of the aggregate
@@ -32,6 +35,10 @@ It is intended both as a portfolio piece for potential employers and as a person
 - [ ] Compare domain events approach with procedure approach https://enterprisecraftsmanship.com/posts/domain-events-simple-reliable-solution/ 
 - [ ] Add example of using https://opensource.googleblog.com/2023/03/introducing-service-weaver-framework-for-writing-distributed-applications.html https://serviceweaver.dev/
 - [ ] Add example of using https://github.com/zitadel/zitadel
+- [ ] Add graceful shutdown
+- [ ] Add pprof
+- [ ] Add migration tool
+- [ ] Try fuzzing
 
 ## Documentation
 [README.md](docs%2FREADME.md)

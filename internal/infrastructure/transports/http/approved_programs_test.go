@@ -3,6 +3,7 @@ package http
 import (
 	"context"
 	"github.com/stretchr/testify/require"
+	"log/slog"
 	"net/http"
 	"net/http/httptest"
 	"reference-application/internal/application/queries/approvedprograms"
@@ -54,7 +55,7 @@ func TestDecodeApprovedProgramsRequest(t *testing.T) {
 	}
 	for _, tc := range tt {
 		t.Run(tc.name, func(t *testing.T) {
-			got, err := decodeApprovedProgramsRequest(context.TODO(), tc.request)
+			got, err := decodeApprovedProgramsRequest(slog.Default())(context.TODO(), tc.request)
 			require.Equal(t, tc.wantErr, err)
 			if tc.wantErr != nil {
 				return

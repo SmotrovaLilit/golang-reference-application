@@ -2,32 +2,39 @@ package http
 
 import (
 	"context"
-	"github.com/go-kit/kit/endpoint"
+	"fmt"
+	kitendpoint "github.com/go-kit/kit/endpoint"
 	kithttp "github.com/go-kit/kit/transport/http"
+	"log/slog"
 	"net/http"
 	"reference-application/internal/application/queries/approvedprograms"
 	xhttp "reference-application/internal/pkg/http"
+	"reference-application/internal/pkg/log"
 	"reference-application/internal/pkg/pager"
 	"reference-application/internal/pkg/slices"
 )
 
 // programsHandlerOptions is a list of options for approved programs handler.
-func newApprovedProgramsHandler(e approvedprograms.Endpoint) http.Handler {
+func newApprovedProgramsHandler(e approvedprograms.Endpoint, logger *slog.Logger) http.Handler {
 	return kithttp.NewServer(
-		endpoint.Endpoint(e),
-		decodeApprovedProgramsRequest,
+		kitendpoint.Endpoint(e),
+		decodeApprovedProgramsRequest(logger),
 		encodeApprovedProgramsResponse,
-		handlersOptions...,
+		getHandlerOptions(e, logger)...,
 	)
 }
 
 // decodeApprovedProgramsRequest decodes request from endpoint.
-func decodeApprovedProgramsRequest(_ context.Context, r *http.Request) (interface{}, error) {
-	_pager, err := pager.NewFromHTTPRequest(r)
-	if err != nil {
-		return nil, xhttp.NewBadRequestError(err)
+func decodeApprovedProgramsRequest(logger *slog.Logger) func(ctx context.Context, r *http.Request) (interface{}, error) {
+	return func(ctx context.Context, r *http.Request) (interface{}, error) {
+		logger := log.WithContext(ctx, logger)
+		_pager, err := pager.NewFromHTTPRequest(r)
+		if err != nil {
+			logger.Warn(fmt.Sprintf("parsing of query parameters is failed: %s", err.Error()))
+			return nil, xhttp.NewBadRequestError(err)
+		}
+		return approvedprograms.NewQuery(_pager), nil
 	}
-	return approvedprograms.NewQuery(_pager), nil
 }
 
 // approvedProgramVersionDTO is a DTO for a program version.

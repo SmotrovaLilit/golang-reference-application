@@ -14,3 +14,6 @@ generate:
 
 build: generate
 	go build ./cmd/server
+
+clean:
+	go clean -cache

@@ -9,6 +9,7 @@ import (
 	"fmt"
 	"github.com/google/wire"
 	"gorm.io/gorm"
+	"log/slog"
 	"net"
 	"net/http"
 	"reference-application/internal/application"
@@ -46,6 +47,7 @@ func (app *Application) Serve(l net.Listener) error {
 func NewApplication(
 	db *gorm.DB,
 	addr HTTPAddr,
+	logger *slog.Logger,
 ) (Application, error) {
 	wire.Build(
 		wire.Struct(new(Application), "*"),

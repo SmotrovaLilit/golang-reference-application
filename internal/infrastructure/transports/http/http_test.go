@@ -4,6 +4,7 @@ import (
 	"context"
 	stdErrors "errors"
 	"github.com/stretchr/testify/require"
+	"log/slog"
 	"net/http/httptest"
 	"reference-application/internal/application/sharederrors"
 	"reference-application/internal/domain/program"
@@ -97,7 +98,7 @@ func Test_convertErrorToApiError(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			writer := httptest.NewRecorder()
-			errorEncoder(context.TODO(), tt.input, writer)
+			errorEncoder(slog.Default())(context.TODO(), tt.input, writer)
 			require.Equal(t, tt.want+"\n", writer.Body.String())
 		})
 	}
@@ -105,6 +106,6 @@ func Test_convertErrorToApiError(t *testing.T) {
 
 func TestErrorEncoderNilError(t *testing.T) {
 	require.Panics(t, func() {
-		_ = convertErrorToApiError(nil)
+		_ = convertErrorToApiError(context.TODO(), slog.Default(), nil)
 	})
 }

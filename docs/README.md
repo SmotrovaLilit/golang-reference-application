@@ -8,8 +8,14 @@
 
 ## Domain model
 [domain.puml](assets/domain.puml)
+
 ![domain_model.png](assets/domain_model.png)
 
 ## Program version state machine
 [program_version_state_machine.puml](assets/program_version_state_machine.puml)
+
 ![program_version_state_machine.png](assets/program_version_state_machine.png)
+
+## Logging
+
+[Logging and panic recovery in handlers](LOGGING.MD)
