@@ -17,10 +17,5 @@
 ![program_version_state_machine.png](assets/program_version_state_machine.png)
 
 ## Logging
-[LOGGING.MD](LOGGING.MD)
 
-### Example of testing that application log information with fields from context [handler_test.go](..%2Finternal%2Fapplication%2Fcommands%2Fapproveprogramversion%2Fhandler_test.go)
-
-💡I did it for one command for example. It can be done for all commands and queries, but not all projects need 100% coverage. It depends on the project.
-
-💡If the project require test logging too, it can be done by providing logger in http and application layers. Using slog.Default doesn't allow to test logging. 
+[Logging and panic recovery in handlers](LOGGING.MD)

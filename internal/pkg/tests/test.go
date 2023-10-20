@@ -73,8 +73,8 @@ func (tdb TestWithDatabase) SaveVersions(t *testing.T, versions []version.Versio
 	}
 }
 
-// Terminate kills the db container.
-func (tdb TestWithDatabase) Terminate(t *testing.T) {
+// TerminateDatabase kills the db container.
+func (tdb TestWithDatabase) TerminateDatabase(t *testing.T) {
 	require.NoError(t, tdb.dbContainer.Terminate(context.Background()))
 }
 

@@ -45,7 +45,6 @@ func NewApplication(db *gorm.DB, addr HTTPAddr, logger *slog.Logger) (Applicatio
 		Logger:     logger,
 	}
 	sendtoreviewprogramversionEndpoint := sendtoreviewprogramversion.NewEndpoint(sendtoreviewprogramversionHandler)
-	logger := provideLogger()
 	approveprogramversionHandler := approveprogramversion.Handler{
 		Repository: versionRepository,
 		Logger:     logger,
@@ -61,14 +60,7 @@ func NewApplication(db *gorm.DB, addr HTTPAddr, logger *slog.Logger) (Applicatio
 		ReadModel: approvedProgramsReadModel,
 	}
 	approvedprogramsEndpoint := approvedprograms.NewEndpoint(approvedprogramsHandler)
-	endpoints := application.Endpoints{
-		CreateProgramEndpoint:              endpoint,
-		UpdateProgramVersionEndpoint:       updateprogramversionEndpoint,
-		SendToReviewProgramVersionEndpoint: sendtoreviewprogramversionEndpoint,
-		ApproveProgramVersionEndpoint:      approveprogramversionEndpoint,
-		DeclineProgramVersionEndpoint:      declineprogramversionEndpoint,
-		ApprovedProgramsEndpoint:           approvedprogramsEndpoint,
-	}
+	endpoints := application.NewEndpoints(logger, endpoint, updateprogramversionEndpoint, sendtoreviewprogramversionEndpoint, approveprogramversionEndpoint, declineprogramversionEndpoint, approvedprogramsEndpoint)
 	sqlDB, err := provideSQL(db)
 	if err != nil {
 		return Application{}, err

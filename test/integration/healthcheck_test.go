@@ -20,7 +20,9 @@ func TestHealthCheck(t *testing.T) {
 
 	resp, err := http.DefaultClient.Do(request)
 	require.NoError(t, err)
-	defer resp.Body.Close()
+	t.Cleanup(func() {
+		resp.Body.Close()
+	})
 	require.Equal(t, http.StatusOK, resp.StatusCode)
 }
 
@@ -31,10 +33,12 @@ func TestHealthCheckFailed(t *testing.T) {
 	request, err := http.NewRequest("GET", test.Addr+"/health", nil)
 	request = request.WithContext(context.TODO())
 	require.NoError(t, err)
-	test.TestWithDatabase.Terminate(t)
+	test.TestWithDatabase.TerminateDatabase(t)
 	time.Sleep(2 * time.Second)
 	resp, err := http.DefaultClient.Do(request)
 	require.NoError(t, err)
-	defer resp.Body.Close()
+	t.Cleanup(func() {
+		resp.Body.Close()
+	})
 	require.Equal(t, http.StatusServiceUnavailable, resp.StatusCode)
 }

@@ -13,6 +13,7 @@ import (
 	"reference-application/internal/pkg/healthcheck"
 	xhttp "reference-application/internal/pkg/http"
 	"reference-application/internal/pkg/log"
+	"reference-application/internal/pkg/panicrecovery"
 	"reference-application/internal/pkg/resource"
 	"time"
 )
@@ -31,7 +32,10 @@ func NewHandler(endpoints application.Endpoints, db *sql.DB, l *slog.Logger) htt
 	router.Handle("/versions/{id}/decline", newDeclineProgramVersionHandler(endpoints.DeclineProgramVersionEndpoint, l)).Methods(http.MethodPut)
 	router.Handle("/store/programs", newApprovedProgramsHandler(endpoints.ApprovedProgramsEndpoint, l)).Methods(http.MethodGet)
 
-	return router
+	var handler http.Handler = router
+	handler = panicrecovery.HTTPHandlerMiddleware(handler, l)
+
+	return handler
 }
 
 type endpointType interface {

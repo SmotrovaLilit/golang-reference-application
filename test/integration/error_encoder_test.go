@@ -11,6 +11,9 @@ import (
 	"testing"
 )
 
+// TestErrorEncoder uses update program version endpoint to test error encoder.
+// Is supposed that all endpoints use error encoder middleware by default.
+// And if error encoder works for one endpoint it means that it works for all endpoints.
 func TestErrorEncoder(t *testing.T) {
 	// Prepare
 	test := tests.PrepareIntegrationTest(t)
