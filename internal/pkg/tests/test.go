@@ -28,7 +28,7 @@ type IntegrationTest struct {
 }
 
 // PrepareDraftVersion creates a version in the database and returns it.
-func (tdb TestWithDatabase) PrepareDraftVersion(t *testing.T) version.Version {
+func (tdb TestWithDatabase) PrepareDraftVersion(_ *testing.T) version.Version {
 	_version, _program := NewDraftVersion()
 	versionRepository := repositories.NewVersionRepository(tdb.DB)
 	programRepository := repositories.NewProgramRepository(tdb.DB)
@@ -38,7 +38,7 @@ func (tdb TestWithDatabase) PrepareDraftVersion(t *testing.T) version.Version {
 }
 
 // PrepareVersionOnReview creates a version in the database and returns it.
-func (tdb TestWithDatabase) PrepareVersionOnReview(t *testing.T) version.Version {
+func (tdb TestWithDatabase) PrepareVersionOnReview(_ *testing.T) version.Version {
 	_version, _program := NewOnReviewVersion()
 	versionRepository := repositories.NewVersionRepository(tdb.DB)
 	programRepository := repositories.NewProgramRepository(tdb.DB)
@@ -48,7 +48,7 @@ func (tdb TestWithDatabase) PrepareVersionOnReview(t *testing.T) version.Version
 }
 
 // PrepareDraftVersionReadyToReview creates a prepared to review draft version in the database and returns it.
-func (tdb TestWithDatabase) PrepareDraftVersionReadyToReview(t *testing.T) version.Version {
+func (tdb TestWithDatabase) PrepareDraftVersionReadyToReview(_ *testing.T) version.Version {
 	_version, _program := NewPreparedToReviewVersion()
 	versionRepository := repositories.NewVersionRepository(tdb.DB)
 	programRepository := repositories.NewProgramRepository(tdb.DB)
@@ -58,7 +58,7 @@ func (tdb TestWithDatabase) PrepareDraftVersionReadyToReview(t *testing.T) versi
 }
 
 // SavePrograms saves programs to the database.
-func (tdb TestWithDatabase) SavePrograms(t *testing.T, programs []program.Program) {
+func (tdb TestWithDatabase) SavePrograms(_ *testing.T, programs []program.Program) {
 	programRepository := repositories.NewProgramRepository(tdb.DB)
 	for _, _program := range programs {
 		programRepository.Save(context.Background(), _program)
@@ -66,7 +66,7 @@ func (tdb TestWithDatabase) SavePrograms(t *testing.T, programs []program.Progra
 }
 
 // SaveVersions saves versions to the database.
-func (tdb TestWithDatabase) SaveVersions(t *testing.T, versions []version.Version) {
+func (tdb TestWithDatabase) SaveVersions(_ *testing.T, versions []version.Version) {
 	versionRepository := repositories.NewVersionRepository(tdb.DB)
 	for _, _version := range versions {
 		versionRepository.Save(context.Background(), _version)

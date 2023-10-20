@@ -78,7 +78,7 @@ func TestHandler_Handle(t *testing.T) {
 	result := resp.(approvedprograms.Result)
 
 	// Test assertions
-	require.Equal(t, 2, len(result))
+	require.Len(t, result, 2)
 	require.Equal(t, approvedProgram1.ID().String(), result[0].ID)
 	require.Equal(t, approvedProgram1.PlatformCode().String(), result[0].PlatformCode)
 	require.Equal(t, approvedVersion1.ID().String(), result[0].Version.ID)

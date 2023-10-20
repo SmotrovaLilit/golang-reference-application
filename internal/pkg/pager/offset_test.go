@@ -26,7 +26,7 @@ func TestNewOffset(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			gotOffset, err := NewOffset(tt.input)
-			require.Equal(t, err, tt.wantErr)
+			require.Equal(t, tt.wantErr, err)
 			require.Equal(t, tt.want, gotOffset)
 		})
 	}
@@ -58,7 +58,7 @@ func TestNewOffsetFromString(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			gotOffset, err := NewOffsetFromString(tt.input)
-			require.Equal(t, err, tt.wantErr)
+			require.Equal(t, tt.wantErr, err)
 			require.Equal(t, tt.want, gotOffset)
 		})
 	}

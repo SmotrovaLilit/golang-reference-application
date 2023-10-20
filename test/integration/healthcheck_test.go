@@ -21,7 +21,7 @@ func TestHealthCheck(t *testing.T) {
 	resp, err := http.DefaultClient.Do(request)
 	require.NoError(t, err)
 	t.Cleanup(func() {
-		resp.Body.Close()
+		_ = resp.Body.Close()
 	})
 	require.Equal(t, http.StatusOK, resp.StatusCode)
 }

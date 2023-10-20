@@ -12,7 +12,6 @@ import (
 func TestEndpointMiddleware(t *testing.T) {
 	endpoint := func(ctx context.Context, request interface{}) (response interface{}, err error) {
 		panic("test panic")
-		return nil, nil
 	}
 	loggerBuffer := &bytes.Buffer{}
 	logger := slog.New(slog.NewTextHandler(loggerBuffer, &slog.HandlerOptions{

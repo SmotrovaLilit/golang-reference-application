@@ -35,7 +35,7 @@ func TestPanicRecovery(t *testing.T) {
 	resp, err := http.DefaultClient.Do(req)
 	require.NoError(t, err)
 	t.Cleanup(func() {
-		resp.Body.Close()
+		_ = resp.Body.Close()
 	})
 	require.Equal(t, http.StatusInternalServerError, resp.StatusCode)
 	data, err := io.ReadAll(resp.Body)

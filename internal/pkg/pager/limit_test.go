@@ -26,7 +26,7 @@ func TestNewLimit(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			gotLimit, err := NewLimit(tt.input)
-			require.Equal(t, err, tt.wantErr)
+			require.Equal(t, tt.wantErr, err)
 			require.Equal(t, tt.want, gotLimit)
 		})
 	}
@@ -58,7 +58,7 @@ func TestNewLimitFromString(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			gotLimit, err := NewLimitFromString(tt.input)
-			require.Equal(t, err, tt.wantErr)
+			require.Equal(t, tt.wantErr, err)
 			require.Equal(t, tt.want, gotLimit)
 		})
 	}
