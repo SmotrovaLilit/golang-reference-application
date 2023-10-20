@@ -18,11 +18,15 @@ func main() {
 	flags.StringVar(&dbType, "db", dbType, "Database type")
 	_ = flags.Parse(os.Args[1:])
 
-	app := NewApplication(
+	app, err := NewApplication(
 		ConnectDB(dbType, dsn),
 		HTTPAddr(httpAddr),
 	)
-	err := app.Run()
+	if err != nil {
+		fmt.Println(err)
+		os.Exit(1)
+	}
+	err = app.Run()
 	if err != nil {
 		fmt.Println(err)
 		os.Exit(1)

@@ -2,18 +2,25 @@ package http
 
 import (
 	"context"
+	"database/sql"
 	"errors"
 	kithttp "github.com/go-kit/kit/transport/http"
 	"github.com/gorilla/mux"
 	"net/http"
 	"reference-application/internal/application"
 	"reference-application/internal/pkg/errorswithcode"
+	"reference-application/internal/pkg/healthcheck"
 	xhttp "reference-application/internal/pkg/http"
+	"time"
 )
 
 // NewHandler creates a new http.Handler.
-func NewHandler(endpoints application.Endpoints) http.Handler {
+func NewHandler(endpoints application.Endpoints, db *sql.DB) http.Handler {
 	r := mux.NewRouter()
+	healthChecker := healthcheck.New(1*time.Second, 60*time.Second) // TODO make configurable
+	healthChecker.Add("database", healthcheck.NewDatabaseChecker(db))
+	r.Handle("/health", healthChecker.Handler())
+	r.Handle("/ready", healthChecker.Handler())
 	r.Handle("/programs", newCreateProgramHandler(endpoints.CreateProgramEndpoint)).Methods(http.MethodPost)
 	r.Handle("/versions/{id}", newUpdateProgramVersionHandler(endpoints.UpdateProgramVersionEndpoint)).Methods(http.MethodPut)
 	r.Handle("/versions/{id}/sendToReview", newSendToReviewProgramVersionHandler(endpoints.SendToReviewProgramVersionEndpoint)).Methods(http.MethodPut)
